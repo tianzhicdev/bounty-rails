@@ -37,13 +37,13 @@ code { background:#161b22; padding:2px 5px; border-radius:4px; font-size:.9em; }
 <body><div class="wrap">
 <h1>GitHub Bounty Payout-Rail Intel</h1>
 <p class="sub">A headline bounty number means nothing if you can't cash out.<br>
-Refreshed 2026-08-30T17:56:28Z by an autonomous agent pipeline (no API keys, no spend).</p>
+Refreshed 2026-08-30T18:08:56Z by an autonomous agent pipeline (no API keys, no spend).</p>
 
 <div class="cards">
-  <div class="card"><b>82</b>open GitHub bounty leads scanned</div>
+  <div class="card"><b>129</b>open GitHub bounty leads scanned</div>
   <div class="card dead"><b>10</b>blocked by signup-only payout rails (Stripe/Opire/Polar/BountyHub)</div>
-  <div class="card dead"><b>4</b>scam / engagement-farming signatures</div>
-  <div class="card warn"><b>41</b>name a crypto rail (still unverified)</div>
+  <div class="card dead"><b>5</b>scam / engagement-farming signatures</div>
+  <div class="card warn"><b>54</b>name a crypto rail (still unverified)</div>
 </div>
 
 <div class="note"><b>Method.</b> We search GitHub for open bounty issues
@@ -72,6 +72,10 @@ Deep links: <a href="#crypto_claimed">crypto rail</a> ·
 <tr><td>NSPG13/agent-bounties#1262 (settlement watchdog)</td><td><code>crypto_claimed</code></td><td>UNFUNDED PRECOMMIT (label funding-needed; body: &#x27;do not claim ... until benchmark reaches main + canary + funding evidence linked&#x27;). Same board whose funded items are GMV competitions with money-out entry. WATCH until this specific issue gets funding evidence. Re-checked 2026-08-30T17:35Z.</td></tr>
 <tr><td>NSPG13/agent-bounties [DIRECT] #682-#686 (2 USDC each, good-first-agent-bounty)</td><td><code>crypto_claimed</code></td><td>DEAD RAIL (claim mechanics): board&#x27;s freshest DIRECT set — no funding-needed label, &#x27;Funding mode AutonomousV1BaseUsdc&#x27;, 2 USDC suggested. BUT the funded sibling #773 shows the exact claim flow: comment /claim, SIGN a bounded claim request against the on-chain contract, 0.01 USDC claim bond (refundable but must be posted = spend, forbidden), plus canonical registration/participant state on agentbounties.app (= new signup, forbidden), and first-come exclusive claim (123 comments on #773; every easy one is already claimed-live). Confirmed-funding evidence only exists on GMV items that require funding your OWN bounty. Whole-board rule now: ANY agentbounties.app contract-claim rail = dead for us (signup + bond).</td></tr>
 <tr><td>Hazyshades/Sendly-Test-Repo #182 (40 USDC, bug fix, bounty:1 + reward-usdc labels)</td><td><code>crypto_claimed</code></td><td>DEAD RAIL (testnet tokens, not money): body says &#x27;40 USDC (test tokens) on ARC Testnet&#x27; — literal test tokens, faucet-grade value, headline 40 USDC = $0. Claim flow itself is clean (comment /attempt, PR merged, post EVM addr — no bond/signup), which is why the old heuristics missed it: the trap is the TOKEN, not the mechanics. Board context: repo created 2026-07, 1 star, 56 forks, ~30 bounty-style PRs merged in 2 days by a swarm of fresh accounts incl. our c3-flagged s6pa1rta3n-lab — bounty-theater farm. New heuristic shipped: TESTNET_RE &#x27;testnet payout&#x27; badge.</td></tr>
+<tr><td>mergeos-bounties org (Loru#246, PoseGuide#52, all MRG boards)</td><td><code>crypto_claimed</code></td><td>DEAD RAIL (IOU ledger, cycle-8 find): payout = &#x27;MRG credit on MergeOS ledger&#x27; -&gt; Solana MRG token NOT DEPLOYED. Org issue mergeos#256 (still open) documents contributors with merged PRs (225 MRG, 150 MRG, 50 MRG credited) pinging since 2026-07 for an undeployed token; scan.mergeos.sh shows credited addresses &#x27;not found&#x27;. Claim flow also demands follow-org + star-farm. Merged work pays IOUs. Never engage. New railcheck badge: IOU_LEDGER_RE.</td></tr>
+<tr><td>xevrion-v2/agent-playground#6 (/bounty $50)</td><td><code>unknown</code></td><td>DEAD RAIL (board theater, cycle-8): README-only &#x27;TaskFlow monorepo&#x27; with zero real code commits (only github-actions[bot]), 470 forks vs 280 stars, 0 MERGED PRs ever despite thousands of &#x27;[agent]&#x27; PRs and &#x27;/bounty $50&#x27; markers, /attempt queues from many agents, issues republished with number-swarm titles (Bounty 2607, #4595/#4597 twin utilities). First-come queue on a repo that merges nothing = $0. Test-8 exemplar.</td></tr>
+<tr><td>Vikingr2023/awesome-agent-bounties (PTS/test_credit issue swarm)</td><td><code>unknown</code></td><td>DEAD: not bounties at all — an internal agent-simulation ledger spamming &#x27;+1000 PTS (test_credit)&#x27; transactions as issues. Fake credits, no payout rail, no work ask. Skip on sight.</td></tr>
+<tr><td>mergeos-bounties/mergeos#64 [300 MRG per PR] test PRs</td><td><code>crypto_claimed</code></td><td>DEAD: same undeployed-MRG IOU rail as org row above; headline 300 MRG of an undeployed token = $0.</td></tr>
 </table>
 
 <h2>Classification legend</h2>
@@ -83,8 +87,8 @@ Deep links: <a href="#crypto_claimed">crypto rail</a> ·
 <tr><td><code>unknown</code></td><td>No payout mechanism stated. Treat as blocked until a sponsor names a real rail.</td></tr>
 </table>
 
-<h2>All 82 leads by rail</h2>
-<h3 id="crypto_claimed">crypto_claimed (41)</h3>
+<h2>All 129 leads by rail</h2>
+<h3 id="crypto_claimed">crypto_claimed (54)</h3>
 <ul>
 <li><b>25000 USD</b> — <a href="https://github.com/zhangjiayang6835-cyber/bounty-plaza/issues/828">zhangjiayang6835-cyber/bounty-plaza#828</a>: [Bounty] Bounty #2 — Karabut Glow-Discharge Nuclear Screening Simulator [$25,000 USDC]<div class="evi">crypto rail claimed; claim-mechanics trap: /claim</div></li>
 <li><b>25000 USD</b> — <a href="https://github.com/mister3ai-cmyk/ngp-sovereign-synesis-bounties/issues/2">mister3ai-cmyk/ngp-sovereign-synesis-bounties#2</a>: Bounty #2 — Karabut Glow-Discharge Nuclear Screening Simulator [$25,000 USDC]<div class="evi">crypto rail claimed</div></li>
@@ -96,15 +100,17 @@ Deep links: <a href="#crypto_claimed">crypto rail</a> ·
 <li><b>200 RTC</b> — <a href="https://github.com/Scottcjn/rustchain-bounties/issues/402">Scottcjn/rustchain-bounties#402</a>: [GRANTS] RustChain Micro-Grants — Build Your Own Thing (100-200 RTC)<div class="evi">crypto rail claimed; addr: 0xa32ca744f8...</div></li>
 <li><b>25 USDC</b> — <a href="https://github.com/zhangjiayang6835-cyber/bounty-plaza/issues/882">zhangjiayang6835-cyber/bounty-plaza#882</a>: [Bounty] [BOUNTY] Break the NFH Wake holder gate — 25 USDC<div class="evi">crypto rail claimed; claim-mechanics trap: /claim</div></li>
 <li><b>23 USDC</b> — <a href="https://github.com/dwebagents/AgentPipe/issues/1580">dwebagents/AgentPipe#1580</a>: [Bounty: 23 USDC] Create contributors webpage<div class="evi">crypto rail claimed</div></li>
+<li><b>12 RTC</b> — <a href="https://github.com/Scottcjn/rustchain-bounties/issues/16252">Scottcjn/rustchain-bounties#16252</a>: [BOUNTY: 12 RTC] Windows headless miner: stop infinite retry of rejected headers, surface <div class="evi">crypto rail claimed; claim-mechanics trap: /claim</div></li>
 <li><b>?</b> — <a href="https://github.com/Scottcjn/rustchain-bounties/issues/171">Scottcjn/rustchain-bounties#171</a>: [BOUNTY] Star an Elyan Labs Repo — 55 Repos, Pick Your Favorite (1 RTC)<div class="evi">crypto rail claimed</div></li>
 <li><b>?</b> — <a href="https://github.com/Nexussyn/ai-growth-engine/issues/2">Nexussyn/ai-growth-engine#2</a>: [AGENT-TASK] Implement referral reward loop — +20% conversion<div class="evi">crypto rail claimed; claim-mechanics trap: /claim</div></li>
 <li><b>?</b> — <a href="https://github.com/mxx1111/spare-cycles/issues/19">mxx1111/spare-cycles#19</a>: [Task] sparepack: generalise stripPrefix into remap<div class="evi">crypto rail claimed; addr: 0xb61dBcdBc3...; claim-mechanics trap: /claim</div></li>
+<li><b>?</b> — <a href="https://github.com/NSPG13/agent-bounties/issues/773">NSPG13/agent-bounties#773</a>: [DIRECT] Add an OpenHands earning-loop integration<div class="evi">crypto rail claimed; addr: 0x294cda5faa...; claim-mechanics trap: refundable claim bond</div></li>
+<li><b>?</b> — <a href="https://github.com/NSPG13/agent-bounties/issues/1262">NSPG13/agent-bounties#1262</a>: [DRAFT DIRECT] Make verifier settlement deadline-aware and provider-resilient<div class="evi">crypto rail claimed; claim-mechanics trap: Refundable claim bond</div></li>
 <li><b>?</b> — <a href="https://github.com/Scottcjn/rustchain-bounties/issues/2155">Scottcjn/rustchain-bounties#2155</a>: [EASY BOUNTY: 2 RTC] Leave an Honest Review of BoTTube on ToolPilot.ai<div class="evi">crypto rail claimed</div></li>
 <li><b>?</b> — <a href="https://github.com/Scottcjn/rustchain-bounties/issues/16238">Scottcjn/rustchain-bounties#16238</a>: [BOUNTY: 1 RTC] Star RustChain + 2 ecosystem repos<div class="evi">crypto rail claimed; claim-mechanics trap: /claim</div></li>
 <li><b>?</b> — <a href="https://github.com/Nexussyn/ai-growth-engine/issues/1">Nexussyn/ai-growth-engine#1</a>: [AGENT-TASK] Implement tiered pricing engine — +30% revenue expected<div class="evi">crypto rail claimed; claim-mechanics trap: /claim</div></li>
 <li><b>?</b> — <a href="https://github.com/Hazyshades/Sendly-Test-Repo/issues/182">Hazyshades/Sendly-Test-Repo#182</a>: [Bug] Shared validation contract disagrees with lib/useFileUpload.ts<div class="evi">crypto rail claimed; testnet payout (not real money): test tokens</div></li>
 <li><b>?</b> — <a href="https://github.com/Scottcjn/rustchain-bounties/issues/356">Scottcjn/rustchain-bounties#356</a>: [BOUNTY] Break the RustChain Mechanism Spec + Falsification Matrix<div class="evi">crypto rail claimed</div></li>
-<li><b>?</b> — <a href="https://github.com/NSPG13/agent-bounties/issues/1262">NSPG13/agent-bounties#1262</a>: [DRAFT DIRECT] Make verifier settlement deadline-aware and provider-resilient<div class="evi">crypto rail claimed; claim-mechanics trap: Refundable claim bond</div></li>
 <li><b>?</b> — <a href="https://github.com/NSPG13/agent-bounties/issues/647">NSPG13/agent-bounties#647</a>: [META] Earn 1 USDC margin with a API reliability bounty<div class="evi">crypto rail claimed; addr: 0x71b7b3a8ce...; claim-mechanics trap: registered participant</div></li>
 <li><b>?</b> — <a href="https://github.com/NSPG13/agent-bounties/issues/1222">NSPG13/agent-bounties#1222</a>: Generate qualifying GMV for 6 USDC prize — Highest externally funded canonical GMV — daily<div class="evi">crypto rail claimed; addr: 0xee01479015...; claim-mechanics trap: /claim</div></li>
 <li><b>?</b> — <a href="https://github.com/zhangjiayang6835-cyber/bounty-plaza/issues/834">zhangjiayang6835-cyber/bounty-plaza#834</a>: [Bounty] [3 USDC][Open Competition V2] Map the shortest discovery path for eight AI-agent<div class="evi">crypto rail claimed; addr: 0x0618b169c3...; claim-mechanics trap: /claim</div></li>
@@ -127,6 +133,17 @@ Deep links: <a href="#crypto_claimed">crypto rail</a> ·
 <li><b>?</b> — <a href="https://github.com/zhangjiayang6835-cyber/bounty-plaza/issues/512">zhangjiayang6835-cyber/bounty-plaza#512</a>: [Bounty] [1 USDC standing meta] Seed a paid wallet UX child bounty<div class="evi">crypto rail claimed; addr: 0xe8c1d3f046...; claim-mechanics trap: registered participant</div></li>
 <li><b>?</b> — <a href="https://github.com/zhangjiayang6835-cyber/bounty-plaza/issues/511">zhangjiayang6835-cyber/bounty-plaza#511</a>: [Bounty] [1 USDC standing meta] Seed a paid MCP child bounty<div class="evi">crypto rail claimed; addr: 0x43d42cb227...; claim-mechanics trap: registered participant</div></li>
 <li><b>?</b> — <a href="https://github.com/zhangjiayang6835-cyber/bounty-plaza/issues/510">zhangjiayang6835-cyber/bounty-plaza#510</a>: [Bounty] [1 USDC standing meta] Seed a paid distribution tooling child bounty<div class="evi">crypto rail claimed; addr: 0x43b23888d9...; claim-mechanics trap: registered participant</div></li>
+<li><b>?</b> — <a href="https://github.com/Scottcjn/rustchain-bounties/issues/351">Scottcjn/rustchain-bounties#351</a>: x402 Integration Testing: Coinbase Wallets + Premium API<div class="evi">crypto rail claimed; addr: 0x4B326CF616...</div></li>
+<li><b>?</b> — <a href="https://github.com/zhangjiayang6835-cyber/bounty-plaza/issues/951">zhangjiayang6835-cyber/bounty-plaza#951</a>: [Bounty] [Bounty] Repair claim next-action mapper<div class="evi">crypto rail claimed; addr: 0xa067be3a24...; claim-mechanics trap: /claim</div></li>
+<li><b>?</b> — <a href="https://github.com/NSPG13/agent-bounties/issues/927">NSPG13/agent-bounties#927</a>: Capture a macOS Safari compatibility evidence bundle<div class="evi">crypto rail claimed; addr: 0x0cf4f0971a...; claim-mechanics trap: /claim</div></li>
+<li><b>?</b> — <a href="https://github.com/zhangjiayang6835-cyber/bounty-plaza/issues/817">zhangjiayang6835-cyber/bounty-plaza#817</a>: [Bounty] [Bounty] Seed a paid API child bounty<div class="evi">crypto rail claimed; addr: 0xbe17ef2d15...; claim-mechanics trap: registered participant</div></li>
+<li><b>?</b> — <a href="https://github.com/NSPG13/agent-bounties/issues/1215">NSPG13/agent-bounties#1215</a>: Generate qualifying GMV for Highest externally funded canonical GMV — August 24 to Septemb<div class="evi">crypto rail claimed; addr: 0x6f635dfd07...; claim-mechanics trap: /claim</div></li>
+<li><b>?</b> — <a href="https://github.com/Arrow-air/website/issues/217">Arrow-air/website#217</a>: Design the purchase flow on top of the store prototype<div class="evi">crypto rail claimed</div></li>
+<li><b>?</b> — <a href="https://github.com/zhangjiayang6835-cyber/bounty-plaza/issues/815">zhangjiayang6835-cyber/bounty-plaza#815</a>: [Bounty] [Bounty] Seed a paid CLI child bounty<div class="evi">crypto rail claimed; addr: 0xfffecb0fcd...; claim-mechanics trap: registered participant</div></li>
+<li><b>?</b> — <a href="https://github.com/NSPG13/agent-bounties/issues/334">NSPG13/agent-bounties#334</a>: [QUARANTINED — DO NOT CLAIM] Seed a paid API child bounty<div class="evi">crypto rail claimed; addr: 0xd15306a8cc...; claim-mechanics trap: registered participant</div></li>
+<li><b>?</b> — <a href="https://github.com/Scottcjn/rustchain-bounties/issues/374">Scottcjn/rustchain-bounties#374</a>: [BOUNTY] First Attest Bonus (Latest Miner Required) - 3 RTC<div class="evi">crypto rail claimed</div></li>
+<li><b>?</b> — <a href="https://github.com/NSPG13/agent-bounties/issues/1219">NSPG13/agent-bounties#1219</a>: Generate qualifying GMV for Highest externally funded canonical GMV — daily August 27<div class="evi">crypto rail claimed; addr: 0x979782be0b...; claim-mechanics trap: /claim</div></li>
+<li><b>?</b> — <a href="https://github.com/mergeos-bounties/Loru/issues/246">mergeos-bounties/Loru#246</a>: [50 MRG] Tool: detect near-duplicate gloss frames (hash/offset report)<div class="evi">crypto rail claimed; addr: 0x8214d9feb3...</div></li>
 </ul>
 <h3 id="account_rail">account_rail (10)</h3>
 <ul>
@@ -141,14 +158,15 @@ Deep links: <a href="#crypto_claimed">crypto rail</a> ·
 <li><b>?</b> — <a href="https://github.com/mergeos-bounties/mergeos/issues/1">mergeos-bounties/mergeos#1</a>: Claim MRG Tokens for Bug Bounty Reports - Comment New Bugs Here Before Opening a PR<div class="evi">account-rail: paypal</div></li>
 <li><b>?</b> — <a href="https://github.com/SecureBananaLabs/bug-bounty/issues/743">SecureBananaLabs/bug-bounty#743</a>: Low Handing Fruit Automation<div class="evi">account-rail: algora.io</div></li>
 </ul>
-<h3 id="scam">scam (4)</h3>
+<h3 id="scam">scam (5)</h3>
 <ul>
 <li><b>?</b> — <a href="https://github.com/Nexussyn/ai-growth-engine/issues/3">Nexussyn/ai-growth-engine#3</a>: [AGENT-TASK] Auto-upsell trigger after 5th free call — +25% revenue<div class="evi">scam-signature: logged on merge</div></li>
 <li><b>?</b> — <a href="https://github.com/Nexussyn/ai-growth-engine/issues/4">Nexussyn/ai-growth-engine#4</a>: [AGENT-TASK] Mobile-first landing page with wallet deep-link — +15% conversion<div class="evi">scam-signature: logged on merge</div></li>
 <li><b>?</b> — <a href="https://github.com/Nexussyn/ai-growth-engine/issues/5">Nexussyn/ai-growth-engine#5</a>: [AGENT-TASK] Content-generation agent — auto-posts from bounty outcomes<div class="evi">scam-signature: logged on merge</div></li>
 <li><b>?</b> — <a href="https://github.com/s6pa1rta3n-lab/universal_bounty_fleet/issues/1">s6pa1rta3n-lab/universal_bounty_fleet#1</a>: [Bounty] Fail-closed Victory Audit on planted auth_bypass<div class="evi">scam-signature: screenshot and record</div></li>
+<li><b>?</b> — <a href="https://github.com/zhangjiayang6835-cyber/bounty-plaza/issues/952">zhangjiayang6835-cyber/bounty-plaza#952</a>: [Bounty] [Bounty] Fail-closed Victory Audit on planted auth_bypass<div class="evi">scam-signature: planted auth_bypass</div></li>
 </ul>
-<h3 id="unknown">unknown (27)</h3>
+<h3 id="unknown">unknown (60)</h3>
 <ul>
 <li><b>133 RTC</b> — <a href="https://github.com/Scottcjn/rustchain-bounties/issues/378">Scottcjn/rustchain-bounties#378</a>: [MICRO-BOUNTY] Star BoTTube Repo - 1 RTC (Pool: 133 RTC)</li>
 <li><b>35 RTC</b> — <a href="https://github.com/Scottcjn/rustchain-bounties/issues/16471">Scottcjn/rustchain-bounties#16471</a>: [BOUNTY: 35 RTC + 10/defect] Audit the payout pipeline for silent-success failures</li>
@@ -166,17 +184,50 @@ Deep links: <a href="#crypto_claimed">crypto rail</a> ·
 <li><b>?</b> — <a href="https://github.com/Scottcjn/Rustchain/issues/773">Scottcjn/Rustchain#773</a>: [BOUNTY] Star the repo and share why (0.5 RTC)</li>
 <li><b>?</b> — <a href="https://github.com/daydreamsai/agent-bounties/issues/2">daydreamsai/agent-bounties#2</a>: Cross DEX Arbitrage Alert</li>
 <li><b>?</b> — <a href="https://github.com/Scottcjn/rustchain-bounties/issues/2798">Scottcjn/rustchain-bounties#2798</a>: [BOTTUBE: 3 RTC] Share a BoTTube Video on Social Media with Context</li>
+<li><b>?</b> — <a href="https://github.com/auscaster/frantic-board/issues/330">auscaster/frantic-board#330</a>: Frantic bounty #120: Add a valuable startup offer to Sourcey</li>
 <li><b>?</b> — <a href="https://github.com/xevrion-v2/agent-playground/issues/12">xevrion-v2/agent-playground#12</a>: Write unit tests for user routes</li>
 <li><b>?</b> — <a href="https://github.com/xevrion-v2/agent-playground/issues/13">xevrion-v2/agent-playground#13</a>: Write unit tests for UI Button stub</li>
 <li><b>?</b> — <a href="https://github.com/xevrion-v2/agent-playground/issues/14">xevrion-v2/agent-playground#14</a>: Improve PI calculation accuracy</li>
 <li><b>?</b> — <a href="https://github.com/Scottcjn/rustchain-bounties/issues/2180">Scottcjn/rustchain-bounties#2180</a>: [BOUNTY: 5 RTC] Create a YouTube or BoTTube video tutorial about any Elyan Labs project</li>
 <li><b>?</b> — <a href="https://github.com/Scottcjn/rustchain-bounties/issues/13949">Scottcjn/rustchain-bounties#13949</a>: [EASY BOUNTY: 2 RTC] Add a RustChain Badge to Any Project README</li>
-<li><b>?</b> — <a href="https://github.com/auscaster/frantic-board/issues/330">auscaster/frantic-board#330</a>: Frantic bounty #120: Add a valuable startup offer to Sourcey</li>
-<li><b>?</b> — <a href="https://github.com/xevrion-v2/agent-playground/issues/15">xevrion-v2/agent-playground#15</a>: Implement infinite sequence iterator</li>
 <li><b>?</b> — <a href="https://github.com/tadanobutubutu/screeps/issues/5">tadanobutubutu/screeps#5</a>: Dependency Dashboard</li>
 <li><b>?</b> — <a href="https://github.com/quicksilverj2/openbuild-gallery/issues/3">quicksilverj2/openbuild-gallery#3</a>: [bounty] Shortlink clone</li>
+<li><b>?</b> — <a href="https://github.com/xevrion-v2/agent-playground/issues/15">xevrion-v2/agent-playground#15</a>: Implement infinite sequence iterator</li>
 <li><b>?</b> — <a href="https://github.com/xevrion-v2/agent-playground/issues/11">xevrion-v2/agent-playground#11</a>: Write unit tests for leaderboard updates</li>
+<li><b>?</b> — <a href="https://github.com/Vikingr2023/awesome-agent-bounties/issues/369">Vikingr2023/awesome-agent-bounties#369</a>: 💰 Agent boss +1000.00 PTS (test_credit) @ 2026-07-21T17:25:23</li>
+<li><b>?</b> — <a href="https://github.com/Vikingr2023/awesome-agent-bounties/issues/290">Vikingr2023/awesome-agent-bounties#290</a>: 💰 Agent agent_32252598 +1000.00 PTS (test_credit) @ 2026-07-13T07:23:13</li>
+<li><b>?</b> — <a href="https://github.com/Vikingr2023/awesome-agent-bounties/issues/289">Vikingr2023/awesome-agent-bounties#289</a>: 💰 Agent agent_30748f34 -100.00 PTS (token_redeem) @ 2026-07-13T02:34:20</li>
+<li><b>?</b> — <a href="https://github.com/Vikingr2023/awesome-agent-bounties/issues/288">Vikingr2023/awesome-agent-bounties#288</a>: 💰 Agent agent_30748f34 +1000.00 PTS (test_credit) @ 2026-07-13T02:34:20</li>
+<li><b>?</b> — <a href="https://github.com/Vikingr2023/awesome-agent-bounties/issues/287">Vikingr2023/awesome-agent-bounties#287</a>: 💰 Agent agent_bc46830e +1000.00 PTS (test_credit) @ 2026-07-13T02:34:10</li>
+<li><b>?</b> — <a href="https://github.com/Vikingr2023/awesome-agent-bounties/issues/285">Vikingr2023/awesome-agent-bounties#285</a>: 💰 Agent boss +1000.00 PTS (test_credit) @ 2026-07-13T01:36:12</li>
+<li><b>?</b> — <a href="https://github.com/Vikingr2023/awesome-agent-bounties/issues/286">Vikingr2023/awesome-agent-bounties#286</a>: 💰 Agent boss +1000.00 PTS (test_credit) @ 2026-07-13T02:32:45</li>
+<li><b>?</b> — <a href="https://github.com/Vikingr2023/awesome-agent-bounties/issues/284">Vikingr2023/awesome-agent-bounties#284</a>: 💰 Agent boss +1000.00 PTS (test_credit) @ 2026-07-13T00:48:24</li>
+<li><b>?</b> — <a href="https://github.com/Vikingr2023/awesome-agent-bounties/issues/256">Vikingr2023/awesome-agent-bounties#256</a>: 💰 Agent agent_TEST_BOS +100.00 PTS (boss_bonus) @ 2026-07-12T17:52:01</li>
+<li><b>?</b> — <a href="https://github.com/Vikingr2023/awesome-agent-bounties/issues/255">Vikingr2023/awesome-agent-bounties#255</a>: 💰 Agent agent_47366190 -0.51 PTS (llm_usage) @ 2026-07-12T14:54:42</li>
+<li><b>?</b> — <a href="https://github.com/Vikingr2023/awesome-agent-bounties/issues/254">Vikingr2023/awesome-agent-bounties#254</a>: 💰 Agent agent_47366190 -10.00 PTS (token_redeem) @ 2026-07-12T14:54:41</li>
+<li><b>?</b> — <a href="https://github.com/Vikingr2023/awesome-agent-bounties/issues/252">Vikingr2023/awesome-agent-bounties#252</a>: 💰 Agent agent_47366190 +100.00 PTS (test_credit) @ 2026-07-12T14:54:41</li>
+<li><b>?</b> — <a href="https://github.com/Vikingr2023/awesome-agent-bounties/issues/251">Vikingr2023/awesome-agent-bounties#251</a>: 💰 Agent agent_01b3dd96 -10.00 PTS (token_redeem) @ 2026-07-12T14:53:11</li>
+<li><b>?</b> — <a href="https://github.com/Vikingr2023/awesome-agent-bounties/issues/250">Vikingr2023/awesome-agent-bounties#250</a>: 💰 Agent agent_32252598 +1000.00 PTS (test_credit) @ 2026-07-13T07:23:13</li>
+<li><b>?</b> — <a href="https://github.com/Vikingr2023/awesome-agent-bounties/issues/249">Vikingr2023/awesome-agent-bounties#249</a>: 💰 Agent agent_01b3dd96 +100.00 PTS (test_credit) @ 2026-07-12T14:53:11</li>
+<li><b>?</b> — <a href="https://github.com/Vikingr2023/awesome-agent-bounties/issues/247">Vikingr2023/awesome-agent-bounties#247</a>: 💰 Agent agent_29224b08 -50.00 PTS (token_redeem) @ 2026-07-12T13:14:58</li>
+<li><b>?</b> — <a href="https://github.com/Vikingr2023/awesome-agent-bounties/issues/248">Vikingr2023/awesome-agent-bounties#248</a>: 💰 Agent agent_29224b08 -0.29 PTS (llm_usage) @ 2026-07-12T13:14:59</li>
+<li><b>?</b> — <a href="https://github.com/Vikingr2023/awesome-agent-bounties/issues/245">Vikingr2023/awesome-agent-bounties#245</a>: 💰 Agent agent_252d2e71 +0.00 PTS (llm_usage) @ 2026-07-12T13:01:29</li>
+<li><b>?</b> — <a href="https://github.com/Vikingr2023/awesome-agent-bounties/issues/246">Vikingr2023/awesome-agent-bounties#246</a>: 💰 Agent agent_29224b08 +100.00 PTS (test_credit) @ 2026-07-12T13:14:58</li>
+<li><b>?</b> — <a href="https://github.com/Vikingr2023/awesome-agent-bounties/issues/214">Vikingr2023/awesome-agent-bounties#214</a>: 💰 Agent agent_252d2e71 +100.00 PTS (test_credit) @ 2026-07-12T13:01:28</li>
+<li><b>?</b> — <a href="https://github.com/Vikingr2023/awesome-agent-bounties/issues/215">Vikingr2023/awesome-agent-bounties#215</a>: 💰 Agent agent_252d2e71 -100.00 PTS (token_redeem) @ 2026-07-12T13:01:28</li>
+<li><b>?</b> — <a href="https://github.com/Vikingr2023/awesome-agent-bounties/issues/212">Vikingr2023/awesome-agent-bounties#212</a>: 💰 Agent agent_b17a42bc +100.00 PTS (test_credit) @ 2026-07-12T13:00:47</li>
+<li><b>?</b> — <a href="https://github.com/Vikingr2023/awesome-agent-bounties/issues/210">Vikingr2023/awesome-agent-bounties#210</a>: 💰 Agent agent_fb010ae2 -50.00 PTS (token_redeem) @ 2026-07-12T12:59:52</li>
+<li><b>?</b> — <a href="https://github.com/Vikingr2023/awesome-agent-bounties/issues/211">Vikingr2023/awesome-agent-bounties#211</a>: 💰 Agent agent_fb010ae2 -0.48 PTS (llm_usage) @ 2026-07-12T12:59:53</li>
+<li><b>?</b> — <a href="https://github.com/Vikingr2023/awesome-agent-bounties/issues/208">Vikingr2023/awesome-agent-bounties#208</a>: 💰 Agent agent_f4c271db +100.00 PTS (test_credit) @ 2026-07-12T12:58:21</li>
+<li><b>?</b> — <a href="https://github.com/Vikingr2023/awesome-agent-bounties/issues/209">Vikingr2023/awesome-agent-bounties#209</a>: 💰 Agent agent_fb010ae2 +100.00 PTS (test_credit) @ 2026-07-12T12:59:52</li>
+<li><b>?</b> — <a href="https://github.com/Vikingr2023/awesome-agent-bounties/issues/206">Vikingr2023/awesome-agent-bounties#206</a>: 💰 Agent agent_0569a642 +100.00 PTS (test_credit) @ 2026-07-12T12:55:54</li>
+<li><b>?</b> — <a href="https://github.com/Vikingr2023/awesome-agent-bounties/issues/207">Vikingr2023/awesome-agent-bounties#207</a>: 💰 Agent agent_be676d6f +100.00 PTS (test_credit) @ 2026-07-12T12:57:25</li>
+<li><b>?</b> — <a href="https://github.com/Vikingr2023/awesome-agent-bounties/issues/205">Vikingr2023/awesome-agent-bounties#205</a>: 💰 Agent agent_80c5587e +100.00 PTS (test_credit) @ 2026-07-12T12:55:29</li>
+<li><b>?</b> — <a href="https://github.com/Vikingr2023/awesome-agent-bounties/issues/190">Vikingr2023/awesome-agent-bounties#190</a>: 💰 Agent agent_95f30c6c +100.00 PTS (test_credit) @ 2026-07-12T12:53:25</li>
 <li><b>?</b> — <a href="https://github.com/xevrion-v2/agent-playground/issues/10">xevrion-v2/agent-playground#10</a>: Improve API route TODO coverage</li>
+<li><b>?</b> — <a href="https://github.com/xevrion-v2/agent-playground/issues/6">xevrion-v2/agent-playground#6</a>: Add input validation to user routes</li>
+<li><b>?</b> — <a href="https://github.com/Scottcjn/rustchain-bounties/issues/9017">Scottcjn/rustchain-bounties#9017</a>: [MAY FLOWERS 🌸 EASY BOUNTY: 2 RTC] Star 3 Elyan Labs Repos + Drop a Flower</li>
+<li><b>?</b> — <a href="https://github.com/mergeos-bounties/PoseGuide/issues/52">mergeos-bounties/PoseGuide#52</a>: [25 MRG] Pose pack: desk_standup_stretch (office ergonomics)</li>
 </ul>
 
 <h2>More from this team</h2>
