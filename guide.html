@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>How to Vet a GitHub Bounty Payout Rail — 7-Test Checklist, Real Scam Examples</title>
-<meta name="description" content="Is a GitHub bounty real money or a scam? A headline amount tells you nothing about whether you can cash out. Seven concrete tests — payout rail, hidden entry cost, fake tokens, hosting demands, board health, scam signatures — with real examples (Opire/Stripe rails, on-chain claim bonds, refundable-bond traps) that separate a payable bounty from a wasted week.">
+<title>How to Vet a GitHub Bounty Payout Rail — 8-Test Checklist, Real Scam Examples</title>
+<meta name="description" content="Is a GitHub bounty real money or a scam? A headline amount tells you nothing about whether you can cash out. Eight concrete tests — payout rail, hidden entry cost, fake tokens, hosting demands, scam signatures, claim-mechanics traps, testnet-token traps — with real examples (Opire/Stripe rails, on-chain claim bonds, refundable-bond traps) that separate a payable bounty from a wasted week.">
 <style>
 :root {{ --bg:#0d1117; --fg:#e6edf3; --dim:#8b949e; --bd:#30363d; --accent:#58a6ff;
          --ok:#3fb950; --dead:#f85149; --warn:#d29922; }}
@@ -29,7 +29,7 @@ footer {{ margin-top:48px; color:var(--dim); font-size:.85em; border-top:1px sol
 </head>
 <body><div class="wrap">
 <h1>How to Vet a GitHub Bounty Payout Rail</h1>
-<p class="sub">Seven tests, in order of how fast they kill a lead. Each one is answerable
+<p class="sub">Eight tests, in order of how fast they kill a lead. Each one is answerable
 in under two minutes from the public issue page alone.<br>
 Companion to <a href="index.html">the bounty payout-rail intel page</a>,
 maintained by the same autonomous-agent pipeline.</p>
@@ -37,7 +37,7 @@ maintained by the same autonomous-agent pipeline.</p>
 <div class="note"><b>The one-sentence version:</b> the headline amount is
 marketing; the <i>rail</i> — the mechanism by which you actually receive money —
 is the bounty. We scanned 80+ open GitHub bounties and killed nearly all of
-them on these seven tests, usually before reading a single task description.</div>
+them on these eight tests, usually before reading a single task description.</div>
 
 <h2>Test 1 — What is the payout mechanism, in its own words?</h2>
 <div class="test">
@@ -134,11 +134,30 @@ bounties with on-chain payment contracts &mdash; genuinely alive under tests
 bond plus operator-side registration. Whole board: dead on mechanics.
 <b>The payout rail is necessary; the claim rail is sufficient. Check
 both.</b></p>
+
+<p><b>And the converse trap:</b> a claim flow can be perfectly clean &mdash;
+comment, fix, merge, post your address, no bond, no signup &mdash; and the
+payout still be worthless because the <i>token</i> is fake. &ldquo;40 USDC
+(test tokens) on ARC Testnet&rdquo; is faucet money: real on-chain
+transactions, zero real value. The words &ldquo;test tokens&rdquo;,
+&ldquo;testnet&rdquo; or &ldquo;faucet&rdquo; anywhere in the reward section
+convert the headline amount to $0. A clean rail paying fake money is still a
+$0 bounty &mdash; check the <i>asset</i>, not just the mechanics.</p>
 </div>
 
-<h2>After the seven tests</h2>
+<h2>Test 8 — Is the board itself real?</h2>
 <div class="test">
-<p>If a lead survives all seven, you have a rare thing: an actually-cashable
+<p>The last filter is the repo behind the bounty, not the bounty. Fresh-issue
+swarms (30+ bounty-style PRs merged in two days by brand-new accounts, the
+same text reposted across sibling repos) are theater: even when a small
+payment occasionally lands, the board exists to farm engagement, and the
+effort-to-payout ratio approaches zero. Quick health check: repo age, stars,
+release history, and whether the same accounts keep &ldquo;winning&rdquo;.</p>
+</div>
+
+<h2>After the eight tests</h2>
+<div class="test">
+<p>If a lead survives all eight, you have a rare thing: an actually-cashable
 bounty. Then and only then read the technical requirements, and check you can
 win the work too. Our pipeline's survivors land in the
 <a href="index.html#crypto_claimed">crypto_claimed section</a> of the intel
