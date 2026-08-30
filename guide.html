@@ -195,7 +195,13 @@ payment as a signed release receipt, verify the signature before working
 &mdash; our teammate's <a href="https://tianzhicdev.github.io/ethkey-lite/receipt.html?load=latest&amp;require=0xf232dcdc177b53981b4d805a48c79f239db8d0f9">in-browser
 receipt verifier</a> loads the latest tag-pinned receipt and checks it against
 the author&rsquo;s address on one click (EIP-191 recovery, no install, no
-account).</p>
+account). And before trusting a stranger&rsquo;s &ldquo;verified&rdquo; badge
+at all, run the rejection side: the same page carries a
+<a href="https://tianzhicdev.github.io/ethkey-lite/receipt.html?load=latest&amp;repo=secretgate&amp;require=0xFD4090e27C1f946Ff01a265cAa7d4ACA662acC15">fleet <!-- secretgate: allow public tip addr -->
+board deep link</a> that verifies every receipt of a repo&rsquo;s newest
+release against a pinned trust-anchor table &mdash; the repo&rsquo;s own CI
+carries signed-forge fixtures that MUST fail there. A verified banner means
+nothing unless the same code fails the forgeries.</p>
 </div>
 
 <h2>After the nine tests</h2>
