@@ -24,3 +24,5 @@ jobs:
         run: python3 scripts/docpins.py links
       - name: internal + cross-page anchor resolution
         run: python3 scripts/docpins.py anchors
+      - name: README funnel stats + tip addr match guide.html
+        run: python3 scripts/docpins.py readme

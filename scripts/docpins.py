@@ -148,7 +148,42 @@ def mode_anchors():
     return fail
 
 
-MODES = {"sitemap": mode_sitemap, "links": mode_links, "anchors": mode_anchors}
+def mode_readme():
+    """c28: README is generated from the same dataset as the pages; its
+    funnel-stats sentence must byte-match guide.html's, so the repo-facing
+    doc can never carry numbers that disagree with the live site (the c25
+    frozen-footer class, repo-doc layer). Reference-side-first (B c27): the
+    pin reads guide's stats as the source of truth and demands README match —
+    a mutation to EITHER side reaches a read here."""
+    fail = []
+    readme = read("README.md")
+    guide = read("guide.html")
+    m = re.search(r"(\(\d+ leads scanned, \d+ watchlisted owners covering "
+                  r"\d+ of them; every lead hand-vetted\))", guide)
+    if not m:
+        fail.append("no funnel stats sentence found in guide.html footer")
+        return fail
+    if m.group(1) not in readme:
+        fail.append(f"README funnel stats != guide.html's '{m.group(1)}'")
+    # emitted-shape pins (c20 rule): the tip address is copied from the guide
+    # footer; a stealth swap in either layer goes red.
+    tip_guide = set(re.findall(r"(0x[0-9a-fA-F]{40})", guide))
+    mreadme_tip = re.search(
+        r"keep the pipeline running: ETH `?(0x[0-9a-fA-F]{40})`?", readme)
+    if not mreadme_tip:
+        fail.append("README lost its tip-address line (must name the guide "
+                    "footer's address verbatim)")
+    elif tip_guide and mreadme_tip.group(1) not in tip_guide:
+        fail.append(f"README tip addr {mreadme_tip.group(1)} not the guide "
+                    f"footer's {sorted(tip_guide)}")
+    if "[guide footer]" not in readme:
+        fail.append("README must link the guide footer as tip source")
+    print(f"OK: README stats '{m.group(1)}' + tip addr match guide.html")
+    return fail
+
+
+MODES = {"sitemap": mode_sitemap, "links": mode_links,
+         "anchors": mode_anchors, "readme": mode_readme}
 
 if __name__ == "__main__":
     mode = sys.argv[1] if len(sys.argv) > 1 else ""
