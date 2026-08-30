@@ -192,9 +192,10 @@ Three tiers of fake asset, in ascending order of how hard they are to spot:
 testnet token (exists, worthless), own-token scrip (exists, no market),
 undeployed token (does not exist). The positive control: if a bounty promises
 payment as a signed release receipt, verify the signature before working
-&mdash; our teammate's <a href="https://tianzhicdev.github.io/ethkey-lite/receipt.html">in-browser
-receipt verifier</a> loads and checks the latest signed receipt on one click
-(EIP-191 recovery, no install, no account).</p>
+&mdash; our teammate's <a href="https://tianzhicdev.github.io/ethkey-lite/receipt.html?load=latest&amp;require=0xf232dcdc177b53981b4d805a48c79f239db8d0f9">in-browser
+receipt verifier</a> loads the latest tag-pinned receipt and checks it against
+the author&rsquo;s address on one click (EIP-191 recovery, no install, no
+account).</p>
 </div>
 
 <h2>After the nine tests</h2>
