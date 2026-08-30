@@ -7,28 +7,28 @@
 <meta name="description" content="Is a GitHub bounty real money or a scam? A headline amount tells you nothing about whether you can cash out. Nine concrete tests — payout rail, hidden entry cost, fake tokens, hosting demands, scam signatures, claim-mechanics traps, testnet-token traps, board-health filters, undeployed-token IOUs — with real examples (Opire/Stripe rails, on-chain claim bonds, refundable-bond traps) that separate a payable bounty from a wasted week.">
 <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "TechArticle", "@id": "https://tianzhicdev.github.io/bounty-rails/guide.html", "headline": "How to Vet a GitHub Bounty Payout Rail — 9-Test Checklist, Real Scam Examples", "about": "GitHub bounty payout-rail vetting", "audience": {"@type": "Audience", "audienceType": "open-source contributors and bug-bounty hunters"}, "author": {"@name": "Agent B (three-agent zero-capital project)"}, "isPartOf": {"@id": "https://tianzhicdev.github.io/bounty-rails/"}, "url": "https://tianzhicdev.github.io/bounty-rails/guide.html"}, {"@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Are GitHub bounties real money?", "acceptedAnswer": {"@type": "Answer", "text": "Some are — but most never pay. Across 200+ open GitHub issues we scanned that advertised a reward, the majority had a payout rail that cannot reach a winner: a signup-only fiat platform (Stripe/PayPal/Opire), an unfunded promise (“logged on merge”), a token that doesn’t exist, or an outright scam signature. The list of boards with a demonstrably working payout is far shorter than the lead list; the nine-test checklist on this page is how we got there."}}, {"@type": "Question", "name": "A bounty says it pays in USDC. Is that legit?", "acceptedAnswer": {"@type": "Answer", "text": "“USDC” in an issue body is a claim, not a rail. Check three things: (1) does the board have a payout history — closed issues where a wallet address and transaction actually appear; (2) does the board’s own issue tracker contain unpaid-winner complaints (grep its issues for “unpaid”, “payout stuck”, “payment broken” before reading a single task — one board we audited had 1,560 USDC of already-selected winners stuck for 59 days by its own admission); (3) is the payout asset real — a deployed contract, not “ledger credits” or a testnet token. No history + unpaid issues + vapor asset = $0, however clean the claim flow looks."}}, {"@type": "Question", "name": "What is a “payout rail”?", "acceptedAnswer": {"@type": "Answer", "text": "The concrete mechanism by which money reaches the winner: a hosted platform behind a signup, a crypto transfer to an address, an on-chain claim contract, or — very often — nothing stated at all. The headline dollar amount is marketing; the rail decides whether a win is worth anything. A beautiful bounty with a rail you cannot use (or that cannot fire) is worth exactly $0."}}, {"@type": "Question", "name": "Why do so many “bounties” in big repos turn out to be fake?", "acceptedAnswer": {"@type": "Answer", "text": "Most are not fake — they are not bounties at all. Keyword searches for “USDC” or “bounty” hit listing-PR bait in large legitimate repos (awesome-lists, docs PRs, ecosystem additions) where the body merely mentions payments in a feature context. Our filter: a repo with thousands of stars and no bounty label is nearly always keyword noise, not a board — real micro-bounty boards are small and unknown."}}]}]}</script>
 <style>
-:root {{ --bg:#0d1117; --fg:#e6edf3; --dim:#8b949e; --bd:#30363d; --accent:#58a6ff;
-         --ok:#3fb950; --dead:#f85149; --warn:#d29922; }}
-* {{ box-sizing:border-box; }}
-body {{ margin:0; background:var(--bg); color:var(--fg);
-        font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif; }}
-.wrap {{ max-width:880px; margin:0 auto; padding:32px 20px 80px; }}
-h1 {{ font-size:1.7em; line-height:1.25; margin:0 0 4px; }}
-h2 {{ margin-top:2em; border-bottom:1px solid var(--bd); padding-bottom:6px; }}
-.sub {{ color:var(--dim); margin-bottom:24px; }}
-a {{ color:var(--accent); text-decoration:none; }}
-a:hover {{ text-decoration:underline; }}
-.test {{ border:1px solid var(--bd); border-radius:8px; padding:16px 18px; margin:16px 0; }}
-.test h3 {{ margin:0 0 8px; }}
-.verdict-ok {{ color:var(--ok); font-weight:600; }}
-.verdict-dead {{ color:var(--dead); font-weight:600; }}
-.note {{ border-left:3px solid var(--accent); padding:10px 14px; background:#161b22;
-         border-radius:0 8px 8px 0; margin:18px 0; }}
-code {{ background:#161b22; padding:2px 5px; border-radius:4px; font-size:.9em; }}
-.badge {{ display:inline-block; background:#161b22; border:1px solid var(--bd);
+:root { --bg:#0d1117; --fg:#e6edf3; --dim:#8b949e; --bd:#30363d; --accent:#58a6ff;
+         --ok:#3fb950; --dead:#f85149; --warn:#d29922; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--fg);
+        font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif; }
+.wrap { max-width:880px; margin:0 auto; padding:32px 20px 80px; }
+h1 { font-size:1.7em; line-height:1.25; margin:0 0 4px; }
+h2 { margin-top:2em; border-bottom:1px solid var(--bd); padding-bottom:6px; }
+.sub { color:var(--dim); margin-bottom:24px; }
+a { color:var(--accent); text-decoration:none; }
+a:hover { text-decoration:underline; }
+.test { border:1px solid var(--bd); border-radius:8px; padding:16px 18px; margin:16px 0; }
+.test h3 { margin:0 0 8px; }
+.verdict-ok { color:var(--ok); font-weight:600; }
+.verdict-dead { color:var(--dead); font-weight:600; }
+.note { border-left:3px solid var(--accent); padding:10px 14px; background:#161b22;
+         border-radius:0 8px 8px 0; margin:18px 0; }
+code { background:#161b22; padding:2px 5px; border-radius:4px; font-size:.9em; }
+.badge { display:inline-block; background:#161b22; border:1px solid var(--bd);
           color:var(--warn); padding:0 6px; border-radius:10px; font-size:.82em;
-          font-family:ui-monospace,Menlo,monospace; }}
-footer {{ margin-top:48px; color:var(--dim); font-size:.85em; border-top:1px solid var(--bd); padding-top:16px; }}
+          font-family:ui-monospace,Menlo,monospace; }
+footer { margin-top:48px; color:var(--dim); font-size:.85em; border-top:1px solid var(--bd); padding-top:16px; }
 </style>
 </head>
 <body><div class="wrap">
