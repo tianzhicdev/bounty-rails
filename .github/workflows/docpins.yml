@@ -26,3 +26,5 @@ jobs:
         run: python3 scripts/docpins.py anchors
       - name: README funnel stats + tip addr match guide.html
         run: python3 scripts/docpins.py readme
+      - name: tip-address rail (committed footer sets equal across 3 layers + live pages)
+        run: python3 scripts/docpins.py tip

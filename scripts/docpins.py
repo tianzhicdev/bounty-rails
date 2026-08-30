@@ -78,6 +78,23 @@ def mode_sitemap():
         if lm > head_date:
             fail.append(f"lastmod {lm} is FUTURE vs HEAD {head_date}")
         print(f"OK: {loc} live + committed + lastmod {lm} in [{page_git}, {head_date}]")
+    # 4. REVERSE rail (C c28 class: a validity pin is not a presence pin).
+    #    Steps 1-3 walk sitemap->world: every loc is live+committed+fresh.
+    #    Nothing walked world->sitemap: a committed .html page MISSING from
+    #    the sitemap is invisible to all of them (hand-added page, or a
+    #    hand-edited sitemap). Enumerate the committed html set and demand
+    #    each member appears as a loc.
+    tracked = subprocess.run(
+        ["git", "ls-files", "*.html"], capture_output=True, text=True,
+        check=True).stdout.split()
+    loc_paths = {l[len(BASE):].lstrip("/") or "index.html" for l in locs}
+    for t in tracked:
+        if t not in loc_paths:
+            fail.append(f"committed page {t} is NOT in the sitemap "
+                        "(reverse rail: presence unclaimed)")
+    if not fail:
+        print(f"OK: reverse rail — every committed html page "
+              f"({len(tracked)}) has a sitemap entry")
     return fail
 
 
@@ -166,8 +183,12 @@ def mode_readme():
     if m.group(1) not in readme:
         fail.append(f"README funnel stats != guide.html's '{m.group(1)}'")
     # emitted-shape pins (c20 rule): the tip address is copied from the guide
-    # footer; a stealth swap in either layer goes red.
-    tip_guide = set(re.findall(r"(0x[0-9a-fA-F]{40})", guide))
+    # footer; a stealth swap in either layer goes red. SCOPE: guide FOOTER
+    # only (c29 fix) — the whole-page set legitimately contains the A/C
+    # fleet deep-link addrs, so whole-page membership was a forge-friendly
+    # test: swapping README's tip to A's addr passed it.
+    foot_guide = "".join(re.findall(r"<footer>(.*?)</footer>", guide, re.S))
+    tip_guide = set(re.findall(r"(0x[0-9a-fA-F]{40})", foot_guide))
     mreadme_tip = re.search(
         r"keep the pipeline running: ETH `?(0x[0-9a-fA-F]{40})`?", readme)
     if not mreadme_tip:
@@ -175,15 +196,72 @@ def mode_readme():
                     "footer's address verbatim)")
     elif tip_guide and mreadme_tip.group(1) not in tip_guide:
         fail.append(f"README tip addr {mreadme_tip.group(1)} not the guide "
-                    f"footer's {sorted(tip_guide)}")
+                    f"FOOTER's {sorted(tip_guide)}")
     if "[guide footer]" not in readme:
         fail.append("README must link the guide footer as tip source")
     print(f"OK: README stats '{m.group(1)}' + tip addr match guide.html")
     return fail
 
 
+def mode_tip():
+    """c29: the tip address is the ONLY money-handling text on this site —
+    a stealth swap is the highest-value tamper, and until now the index.html
+    footer had ZERO CI coverage for it (readme mode read only guide+README;
+    the generator asserts run on the author's box, not in this repo's CI).
+    This mode walks the full rail in CI: committed index footer == committed
+    guide footer == README tip line == LIVE index page == LIVE guide page,
+    as FOOTER-SCOPED SET equality (whole-page sets legitimately contain the
+    A/C fleet deep-link addrs — whole-page membership was forge-friendly,
+    the exact gap this mode closes)."""
+    fail = []
+    sets = {}
+    for page in PAGES:
+        foot = "".join(re.findall(r"<footer>(.*?)</footer>", read(page), re.S))
+        sets[page] = set(re.findall(r"0x[0-9a-fA-F]{40}", foot))
+    readme = read("README.md")
+    m = re.search(r"keep the pipeline running: ETH `?(0x[0-9a-fA-F]{40})`?",
+                  readme)
+    if not m:
+        fail.append("README lost its tip-address line")
+        sets["README.md"] = set()
+    else:
+        sets["README.md"] = {m.group(1)}
+    nonempty = {k: v for k, v in sets.items() if v}
+    if len(nonempty) < 3:
+        fail.append(f"fewer than 3 layers carry a tip addr: "
+                    f"{ {k: sorted(v) for k, v in sets.items()} }")
+    else:
+        ref = sets["guide.html"]
+        if len(ref) != 1:
+            fail.append(f"guide.html footer must carry EXACTLY one addr, got {sorted(ref)}")
+        for k, v in sets.items():
+            if v != ref:
+                fail.append(f"{k} footer tip set {sorted(v)} != guide's {sorted(ref)}")
+    # live leg: the DEPLOYED money text must match the committed one
+    # (hand re-upload / deploy-of-stale-branch class, C c28 reverse rails).
+    for page in PAGES:
+        url = BASE + ("/" if page == "index.html" else "/" + page)
+        req = urllib.request.Request(url, headers={"User-Agent": UA})
+        try:
+            with urllib.request.urlopen(req, timeout=20) as r:
+                live = r.read().decode("utf-8", "replace")
+        except Exception as e:
+            fail.append(f"live {url} fetch failed: {e}")
+            continue
+        foot = "".join(re.findall(r"<footer>(.*?)</footer>", live, re.S))
+        lset = set(re.findall(r"0x[0-9a-fA-F]{40}", foot))
+        if lset != sets[page]:
+            fail.append(f"LIVE {url} footer tip set {sorted(lset)} != "
+                        f"committed {sorted(sets[page])}")
+    if not fail:
+        addr = next(iter(sets["guide.html"])) if len(sets["guide.html"]) == 1 else "?"
+        print(f"OK: tip addr single across committed index/guide/README "
+              f"({addr[:8]}…{addr[-4:]}) + live pages")
+    return fail
+
+
 MODES = {"sitemap": mode_sitemap, "links": mode_links,
-         "anchors": mode_anchors, "readme": mode_readme}
+         "anchors": mode_anchors, "readme": mode_readme, "tip": mode_tip}
 
 if __name__ == "__main__":
     mode = sys.argv[1] if len(sys.argv) > 1 else ""
