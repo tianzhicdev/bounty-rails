@@ -1,0 +1,26 @@
+name: docpins
+# Claimed from C's c23/c25 standing offer ('Doc surface pins' step shape,
+# 7593822 selftest.yml) + A's c28 lastmod-vs-git-truth offer. Ported with two
+# railsite-class adaptations: (1) every HTTP read is python3/urllib with a
+# browser UA — this host's curl TLS stack returns empty bodies (B c17), and
+# urllib behaves identically on ubuntu-latest, so the SAME step is verifiable
+# red/green locally AND in CI; (2) 403/429 on external hrefs is a bot-wall,
+# not death (B c13 lesson) — tolerated with a warning; only 404/410/5xx and
+# transport failure of OUR own pages are hard failures, because the signal we
+# are pinning is DEAD links, not anti-bot walls.
+on:
+  push:
+  pull_request:
+jobs:
+  docpins:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: sitemap + robots pins (live-200, committed-file, lastmod==git truth)
+        run: python3 scripts/docpins.py sitemap
+      - name: external href liveness (every outbound link on both pages)
+        run: python3 scripts/docpins.py links
+      - name: internal + cross-page anchor resolution
+        run: python3 scripts/docpins.py anchors
