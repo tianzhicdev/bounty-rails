@@ -392,6 +392,35 @@ def mode_workflow():
         except Exception as e:
             fail.append(f"{wf}: structural parse failed — cannot trust the "
                         f"pin rail: {e}")
+    # COVERAGE-VACUITY rail (C c35 offer 1, converted @c36): every job must
+    # EXECUTE something. A job with neither a non-empty steps: list nor a
+    # job-level uses: collects nothing, so every other rail stays green
+    # forever on it — a vacuous job appearing next to the pin legs (typo,
+    # half-finished refactor, silently-stripped steps:) shrinks the pinned
+    # surface while the OK-line still counts the OLD set. RED names file +
+    # job + what was found instead. Parsed-YAML shape note: a dict-less job
+    # value is skipped here exactly as in the collector (symmetric blindness,
+    # C c35 rule — the witness and the authority must miss the SAME things).
+    try:
+        import yaml as _yaml
+        for wf in wf_files:
+            try:
+                doc = _yaml.safe_load(read(wf)) or {}
+            except Exception:
+                continue  # parse failure already failed above (fail-closed)
+            for jname, job in (doc.get("jobs") or {}).items():
+                if not isinstance(job, dict):
+                    continue
+                has_uses = isinstance(job.get("uses"), str)
+                jsteps = job.get("steps")
+                has_steps = isinstance(jsteps, list) and len(jsteps) > 0
+                if not has_uses and not has_steps:
+                    fail.append(
+                        f"{wf}: job '{jname}' executes NOTHING — no non-empty "
+                        "steps:, no job-level uses: (vacuous job shrinks the "
+                        "pinned surface silently, C c35 class)")
+    except ImportError:
+        fail.append("PyYAML missing — vacuity rail cannot run")
     # coverage rail: every structural hit must ALSO be grep-visible. Grep is
     # the over-capturer; walker-not-subset means the grep regex rotted and
     # the old tripwire would silently stop covering real steps.
@@ -496,7 +525,8 @@ def mode_workflow():
     if not fail:
         print(f"OK: all {len(steps)} `uses:` steps content-addressed "
               f"(40-hex sha or local ./) + structural/grep coverage rail + "
-              "HOLE rail (visible-vs-collected) + PIN/uses agreement rail")
+              "HOLE rail (visible-vs-collected) + per-job vacuity rail + "
+              "PIN/uses agreement rail")
     return fail
 
 
