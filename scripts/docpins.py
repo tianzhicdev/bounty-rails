@@ -811,9 +811,17 @@ def mode_deadref():
     for d in dead:
         fail.append(f"README references a path that is not tracked: {d}")
     if not dead:
-        print(f"OK: README prose paths all resolve ({len(seen)} checked: files + dirs"
-              + (f", {len(runtime)} reader-runtime .git/ paths exempt by design)"
-                 if runtime else ")"))
+        # C c45 rule: the exemption line prints ALWAYS — the 0-baseline is
+        # what lets CONTROL pin 'nothing exempt' on a pristine tree; a count
+        # that only appears when non-zero can neither be baseline-pinned
+        # nor name-verified. Names printed too: a count with no names lets a
+        # mutation ride the exemption and stay anonymous. (Measured C c45 /
+        # A c54: a tracked .git/ index entry is unconstructible in git 2.43,
+        # so `rel not in files` here is defense-in-depth, not gap closure.)
+        uniq_rt = sorted(set(runtime))
+        print(f"OK: README prose paths all resolve ({len(seen)} checked: "
+              f"files + dirs; runtime-scope .git/ exemptions: {len(uniq_rt)}"
+              + (f" {uniq_rt}" if uniq_rt else "") + ")")
 
     # B. .secretgateignore liveness (exact path, dir-prefix, or fnmatch —
     # secretgate's real semantics)
