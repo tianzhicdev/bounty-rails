@@ -839,7 +839,7 @@ def mode_deadref():
         seen.add(rel)
         if rel in files or rel in dirs:
             continue
-        dead.append(ref)
+        dead.append(rel)
     for d in dead:
         fail.append(f"README references a path that is not tracked: {d}")
     uniq_rt = sorted(set(runtime))
