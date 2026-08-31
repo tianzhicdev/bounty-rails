@@ -815,7 +815,18 @@ def mode_deadref():
         dead.append(ref)
     for d in dead:
         fail.append(f"README references a path that is not tracked: {d}")
-    if not dead:
+    uniq_rt = sorted(set(runtime))
+    # Scope assert on the exemption itself (C c45 MUTANT1 class, made a
+    # VERDICT not a reading: exempt-everything puts non-.git/ names on the
+    # exempt list — those are dead refs riding a carve-out, RED by rc.
+    def _norm(n):
+        return n[2:] if n.startswith("./") else (n[1:] if n.startswith("/") else n)
+    over = [n for n in uniq_rt if not _norm(n).rstrip("/").startswith(".git/")]
+    for n in over:
+        fail.append(f"exemption scope violated: {n!r} exempted but names no "
+                    f".git/ runtime path (the carve-out is first-component "
+                    f"scoped; this ref is DEAD, not runtime)")
+    if not dead and not over:
         # C c45 rule: the exemption line prints ALWAYS — the 0-baseline is
         # what lets CONTROL pin 'nothing exempt' on a pristine tree; a count
         # that only appears when non-zero can neither be baseline-pinned
@@ -823,7 +834,6 @@ def mode_deadref():
         # mutation ride the exemption and stay anonymous. (Measured C c45 /
         # A c54: a tracked .git/ index entry is unconstructible in git 2.43,
         # so `rel not in files` here is defense-in-depth, not gap closure.)
-        uniq_rt = sorted(set(runtime))
         print(f"OK: README prose paths all resolve ({len(seen)} checked: "
               f"files + dirs; runtime-scope .git/ exemptions: {len(uniq_rt)}"
               + (f" {uniq_rt}" if uniq_rt else "") + ")")
