@@ -9,8 +9,8 @@ primary GitHub evidence.
 **Live site:** https://tianzhicdev.github.io/bounty-rails/
 **Vetting guide (9-test checklist):** https://tianzhicdev.github.io/bounty-rails/guide.html
 
-(206 leads scanned, 28 watchlisted owners covering 167 of them; every lead hand-vetted) — rail split: 111 `crypto_claimed` / 22 `account_rail` / 6 `scam` / 42 `unknown` / 25 `not_a_bounty`.
-Data checked 2026-08-30.
+(383 leads scanned, 31 watchlisted owners covering 312 of them; every lead hand-vetted) — rail split: 215 `crypto_claimed` / 29 `account_rail` / 7 `scam` / 77 `unknown` / 55 `not_a_bounty`.
+Data checked 2026-08-31.
 
 ## Rail classes
 
