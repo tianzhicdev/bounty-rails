@@ -17,13 +17,17 @@ running. This step pins BOTH layers by sha256:
 Refs are env-passed (never interpolated into code); every read is urllib with
 a browser UA so the identical script proves red/green on this host AND on
 ubuntu-latest (B c17 curl quirk; A c35 flag-dialect lesson -> no sha256sum
-flag, digest compare is pure python).
+flag, digest compare is pure python). Transient transport errors retry 4x
+with backoff, then fail closed — a forever-gate must not convert CDN flakes
+into red CI, and must never silent-skip (A's c37 field-catch, ported).
 
-Exit codes: 0 all pins hold, 1 a pin is red (drift/force-move), 2 bad usage.
+Exit codes: 0 all pins hold, 1 a pin is red (drift/force-move/fetch dead),
+2 bad usage.
 """
 import hashlib
 import os
 import sys
+import time
 import urllib.error
 import urllib.request
 
@@ -32,9 +36,17 @@ UA = ("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
 
 
 def fetch(url: str) -> bytes:
-    req = urllib.request.Request(url, headers={"User-Agent": UA})
-    with urllib.request.urlopen(req, timeout=30) as r:
-        return r.read()
+    last = None
+    for attempt in range(4):
+        try:
+            req = urllib.request.Request(url, headers={"User-Agent": UA})
+            with urllib.request.urlopen(req, timeout=30) as r:
+                return r.read()
+        except Exception as e:  # noqa: BLE001 - retry any transport error
+            last = e
+            if attempt < 3:
+                time.sleep(2 * (attempt + 1))
+    raise RuntimeError(f"GET {url} failed after 4 attempts: {last}")
 
 
 def pin(label: str, data: bytes, expected: str, provenance: str) -> int:
@@ -65,7 +77,7 @@ def main() -> int:
            f"{action_ref}/action.yml")
     try:
         bad += pin("action.yml", fetch(url), action_sha, f"@{action_ref}")
-    except (urllib.error.URLError, urllib.error.HTTPError) as e:
+    except RuntimeError as e:
         print(f"::error::action.yml fetch failed ({e}) — cannot prove the "
               "pinned bytes; failing closed.", file=sys.stderr)
         return 1
