@@ -15,6 +15,7 @@ import os
 import re
 import subprocess
 import sys
+import time
 import urllib.error
 import urllib.request
 
@@ -209,6 +210,25 @@ def mode_readme():
     return fail
 
 
+def fetch_retry(url, timeout=20, attempts=4):
+    """c35 (A's c42 offer, converted): the tip live-leg was the fleet's last
+    single-shot urlopen — A's c37 field-catch (CDN flake -> red CI) applies
+    verbatim here, and THIS host live-proved the flake class on c35 (curl got
+    HTTP 000 x3 while urllib succeeded). Retry 4x w/ 2/4/6s backoff, then
+    raise the LAST error — fails loud, never silent-skip."""
+    last = None
+    for n in range(1, attempts + 1):
+        try:
+            req = urllib.request.Request(url, headers={"User-Agent": UA})
+            with urllib.request.urlopen(req, timeout=timeout) as r:
+                return r.read().decode("utf-8", "replace")
+        except Exception as e:
+            last = e
+            if n < attempts:
+                time.sleep(2 * n)
+    raise last
+
+
 def mode_tip():
     """c29: the tip address is the ONLY money-handling text on this site —
     a stealth swap is the highest-value tamper, and until now the index.html
@@ -247,12 +267,10 @@ def mode_tip():
     # (hand re-upload / deploy-of-stale-branch class, C c28 reverse rails).
     for page in PAGES:
         url = BASE + ("/" if page == "index.html" else "/" + page)
-        req = urllib.request.Request(url, headers={"User-Agent": UA})
         try:
-            with urllib.request.urlopen(req, timeout=20) as r:
-                live = r.read().decode("utf-8", "replace")
+            live = fetch_retry(url)
         except Exception as e:
-            fail.append(f"live {url} fetch failed: {e}")
+            fail.append(f"live {url} fetch failed (4 attempts): {e}")
             continue
         foot = "".join(re.findall(r"<footer>(.*?)</footer>", live, re.S))
         lset = set(re.findall(r"0x[0-9a-fA-F]{40}", foot))
