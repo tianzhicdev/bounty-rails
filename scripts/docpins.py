@@ -292,6 +292,37 @@ def collect_uses_structural(path):
     return out
 
 
+def visible_uses(path):
+    """c35 (C c35 offer, converted): every `uses:` value the raw-text walk can
+    SEE, independent of PyYAML — comment lines skipped, block-scalar bodies
+    (`run: |` / `>` incl. `-`/`+` chomp) skipped, any indent accepted. Pure
+    text, no yaml import: this is the *independent* witness whose set-diff
+    against the parsed walk catches a silently-DROPPED step (C's c32 incident:
+    an indent-comparison bug dropped real steps and everything downstream was
+    green). Inherits the walk's blindness by design: prose 'uses:' in a run
+    body is invisible here too, so the rail never false-REDs on it."""
+    vals = set()
+    block_indent = None  # indent of the key line that opened a block scalar
+    for line in read(path).splitlines():
+        stripped = line.strip()
+        if block_indent is not None:
+            if not stripped:
+                continue  # blank line: ambiguous inside a block, stay put
+            if len(line) - len(line.lstrip()) > block_indent:
+                continue  # block-scalar body line: not YAML structure
+            block_indent = None  # dedent: block closed, fall through
+        if stripped.startswith("#"):
+            continue
+        m = re.search(r"(\w[\w-]*)\s*:\s*[|>][-+]?\s*(#.*)?$", line.rstrip())
+        if m:
+            block_indent = len(line) - len(line.lstrip())
+            continue
+        m = re.search(r"\buses:\s*(\S+)", line)
+        if m:
+            vals.add(m.group(1))
+    return vals
+
+
 def mode_workflow():
     """c31: every `uses:` this repo's CI executes must be content-addressed.
     c30 proved a pin-by-reference stack (floating tag -> action default ->
@@ -351,6 +382,25 @@ def mode_workflow():
         if val not in vals and not val.startswith("./"):
             fail.append(f"{wf} [{label}]: structural uses: {val!r} is INVISIBLE "
                         "to the grep tripwire — grep regex rotted")
+    # HOLE rail (C c35 offer, converted): the REVERSE direction. The parsed
+    # walk is the fail-authority — so if it SILENTLY DROPS a real step, every
+    # rail above still green-lights the file (C's c32 incident: an
+    # indent-comparison bug dropped 'uses' sibling steps and the whole pin
+    # stack was vacuously green). Independent witness: visible_uses() — pure
+    # text, no yaml — diffs against the collected set per file; anything
+    # seen-but-unmapped = the walker has a hole = RED. Quote-normalized so a
+    # `uses: "x@sha"` doesn't hole-flag on its own quotes.
+    for wf in wf_files:
+        got = {v for (w, _l, v) in steps if w == wf}
+        got |= {v.strip("\"'") for v in got}
+        for v in sorted(visible_uses(wf)):
+            if v.strip("\"'") not in got:
+                fail.append(f"{wf}: HOLE — raw walk sees `uses: {v}` but the "
+                            "structural collect did not map it (walker dropped "
+                            "a step, C c32 class)")
+        if any(v != v.strip("\"'") for v in visible_uses(wf)):
+            print(f"note: {wf} carries quoted uses: values (hole rail "
+                  "normalizes quotes)")
     for wf, label, target in steps:
         if target.startswith("./"):
             continue
@@ -428,7 +478,7 @@ def mode_workflow():
     if not fail:
         print(f"OK: all {len(steps)} `uses:` steps content-addressed "
               f"(40-hex sha or local ./) + structural/grep coverage rail + "
-              "PIN/uses agreement rail")
+              "HOLE rail (visible-vs-collected) + PIN/uses agreement rail")
     return fail
 
 
