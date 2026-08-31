@@ -12,6 +12,7 @@ import concurrent.futures as cf
 import datetime
 import html.parser
 import os
+import posixpath
 import re
 import subprocess
 import sys
@@ -815,15 +816,23 @@ def mode_deadref():
         refs.append(m.group(1))
     seen, dead, runtime = set(), [], []
     for ref in refs:
+        # ONE canonical form, normalized AT COLLECTION (A c56 delta-1,
+        # measured live c47 on pre-fix bytes: raw-form storage printed
+        # './.git/hooks' while the assert read a stripped form — same
+        # verdict for simple refs, drift waiting for a second shape; and
+        # the same path spelled two ways inflated the exempt count 1->2).
+        # posixpath.normpath ALSO closes the traversal class measured live
+        # c47: '.git/../scripts' startswith('.git/') but resolves OUTSIDE
+        # runtime scope — pre-fix it rode the carve-out rc=0 BLESSED.
         rel = ref[2:] if ref.startswith("./") else (ref[1:] if ref.startswith("/") else ref)
-        rel = rel.rstrip("/")
+        rel = posixpath.normpath(rel.rstrip("/"))
         # .git/ exemption FIRST, before seen/checked (C c41/c45 order): a
         # runtime ref never enters the checked set, so the strengthened F7
         # can assert 'seen stays == CONTROL' as a real class-check (an
         # exempted ref leaking into checked, or a dead ref riding the
         # exemption, move the count).
         if rel.startswith(".git/") and rel not in files:
-            runtime.append(ref)  # reader-runtime; index said no, exempt by design
+            runtime.append(rel)  # reader-runtime; index said no, exempt by design. CANONICAL form (print == assert form)
             continue
         if rel in seen:
             continue
