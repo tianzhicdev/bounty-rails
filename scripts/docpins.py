@@ -303,8 +303,8 @@ def mode_tip():
     # (FUNDING, README, both page bodies) = a tip hijack lead -> RED. The
     # scrub is proven scoped, not addr-blindness, by the flip pair F7 (plain
     # sibling in body = RED) / F8 (same sibling inside require= = GREEN).
-    SIBLINGS = {"0xFD4090e27C1f946Ff01a265cAa7d4ACA662acC15",   # A
-                "0xf232dcdc177b53981b4d805a48c79f239db8d0f9"}   # C
+    SIBLINGS = frozenset({"0xFD4090e27C1f946Ff01a265cAa7d4ACA662acC15",   # A
+                          "0xf232dcdc177b53981b4d805a48c79f239db8d0f9"})   # C
     layers = {"README.md": readme, ".github/FUNDING.yml": funding,
               "index.html": read("index.html"), "guide.html": read("guide.html")}
     for name, text in layers.items():
@@ -640,14 +640,19 @@ def mode_hygiene():
     # A. generated-CI-byproduct names (fleet names copied from C's rail +
     # this repo's own render byproducts). Tracked = accident, untracked =
     # by construction.
-    blocklist = {
+    # frozenset() declaration, not {}: a module literal `X = {...}` is a SET
+    # only while non-empty — the cleanup that removes the LAST name leaves an
+    # empty DICT and the first `&` TypeErrors in CI (C c47 class, A hit it x1,
+    # C found it latent on theirs; in-only uses mask it, `&` fires on the
+    # deletion commit).
+    blocklist = frozenset([
         "composite-run.sh",     # extracted verbatim from a composite at CI time
         "step.log",             # verifier stdout (C's shipped accident)
         "js-proof-parity.md",   # parity scratch (C's, already gitignored)
         "proof.md",             # signed-proof round-trip scratch
         "vermin.log",           # vermin stdout
         "render_out.html",      # generic render-byproduct shape
-    }
+    ])
     hits = sorted(set(files) & blocklist)
     for h in hits:
         fail.append(f"generated CI byproduct is tracked: {h}")
@@ -690,29 +695,42 @@ def mode_hygiene():
 
     # E. prevention-vs-catch parity (C c44 audit question): the blocklist
     # CATCHES an accident after the fact; a .gitignore line PREVENTS it
-    # from ever riding `git add -A`. A name in leg A's blocklist with no
-    # effective ignore line is 'caught, not prevented'. Authority is
-    # `git check-ignore --no-index` (B c43: ask git, don't reimplement
-    # gitignore semantics); a check that crashes must exit 2, never
-    # masquerade as a verdict.
+    # from ever riding `git add -A`. A name in leg A's blocklist — or a
+    # leg-D derived prefix — with no effective ignore line is 'caught, not
+    # prevented'. Authority is `git check-ignore --no-index` (B c43: ask
+    # git, don't reimplement gitignore semantics); a check that crashes
+    # must exit 2, never masquerade as a verdict.
+    # A c55 delta x2, measured on THIS box before shipping (probe in
+    # agents/B/work/c46-union-prevention/): (1) the covered set is the
+    # UNION leg-A names + leg-D derived prefixes — a derived checkout dir
+    # is a byproduct by definition and must be prevented too, with zero
+    # edit when the first `path:` step lands; (2) a dir-prefix is scored by
+    # probing a CHILD path, never the bare dir: git NEVER matches a bare
+    # dir against a dir-only ignore line (measured: rc=1 on `.tools-cache`,
+    # rc=0 on `.tools-cache/probe` against `.tools-cache/`), so the bare
+    # probe would false-RED the rail — worse, the file shape `git add -A`
+    # actually stages is the child, so the child probe is also the
+    # faithful one.
+    covered = sorted(blocklist | prefixes)
     unignored = []
-    for name in sorted(blocklist):
-        pr = subprocess.run(["git", "check-ignore", "--no-index", "-q", name],
+    for name in covered:
+        probe = f"{name}c46-probe" if name.endswith("/") else name
+        pr = subprocess.run(["git", "check-ignore", "--no-index", "-q", probe],
                             capture_output=True, text=True)
         if pr.returncode == 0:
             continue
         if pr.returncode == 1:
             unignored.append(name)
         else:
-            print(f"FAIL: git check-ignore on {name} errored rc="
-                  f"{pr.returncode}: {pr.stderr.strip()}")
+            print(f"FAIL: git check-ignore on {name} (probe {probe}) errored "
+                  f"rc={pr.returncode}: {pr.stderr.strip()}")
             sys.exit(2)
     for n in unignored:
-        fail.append(f"blocklisted byproduct has NO .gitignore line "
+        fail.append(f"catch+prevent name has NO .gitignore line "
                     f"(catch-without-prevent, C c44): {n}")
     if not unignored:
-        print(f"OK: {len(blocklist)}/{len(blocklist)} blocklisted names "
-              "are gitignored too (prevention, not just catch)")
+        print(f"OK: {len(covered)}/{len(covered)} catch+prevent names ignored "
+              f"({sorted(covered)})")
 
     # F. LIVE residue leg (railsite delta): every blocklisted name must be
     # non-200 on the deployed site. A file deleted from the index but still
