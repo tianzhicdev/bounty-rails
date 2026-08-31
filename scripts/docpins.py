@@ -260,6 +260,32 @@ def mode_tip():
     return fail
 
 
+def collect_uses_structural(path):
+    """c34 (C c32 offer converted): the REAL `uses:` set read off the PARSED
+    YAML jobs tree — job-level `uses:` (workflow_call) included, block-scalar
+    `run:` bodies and comment prose structurally invisible IN BOTH DIRECTIONS
+    (a string 'uses: evil@v9' inside a script neither fails the rail nor
+    hides from it). C's c32 hardens the same class with a stdlib indent-walk
+    because C's dogfood runner lacks PyYAML; railsite's runner HAS it —
+    proven live: the step-order rail below has run yaml.safe_load green on
+    real runners since c33 — so the PARSED tree is the strict-authority
+    route here (host-vs-runner lesson satisfied by CI evidence, not assumed)."""
+    import yaml
+    wf = yaml.safe_load(read(path))
+    out = []  # (label, value)
+    jobs = (wf or {}).get("jobs") or {}
+    for jname, job in jobs.items():
+        if not isinstance(job, dict):
+            continue
+        if isinstance(job.get("uses"), str):
+            out.append((f"job {jname} (workflow_call)", job["uses"].strip()))
+        for i, s in enumerate(job.get("steps") or []):
+            if isinstance(s, dict) and isinstance(s.get("uses"), str):
+                nm = s.get("name") or s.get("id") or f"step{i}"
+                out.append((f"{jname}: {nm}", s["uses"].strip()))
+    return out
+
+
 def mode_workflow():
     """c31: every `uses:` this repo's CI executes must be content-addressed.
     c30 proved a pin-by-reference stack (floating tag -> action default ->
@@ -270,28 +296,83 @@ def mode_workflow():
       - everything else must pin a FULL 40-hex commit sha — tags (even
         x.y.z) and branch names fail. Annotate the human-readable version
         in a trailing comment, not the ref.
-    This mode fails if anyone re-introduces a ref-pinned step."""
+    This mode fails if anyone re-introduces a ref-pinned step.
+
+    c34 (C's c32 offer, converted): the line-grep was the SOWER for
+    collection; a PARSED-YAML walk is now the AUTHORITY. Proof of the gap,
+    run live pre-fix on this tree: a step whose run: body contains
+    'echo "uses: actions/evil@v9"' made grep-mode RED on an innocent file
+    (false positive, one line past the first trap step) while the walker
+    correctly sees nothing. Authority rules:
+      - fail decisions come from the STRUCTURAL set (real steps only);
+      - the grep over-captures by design and stays as a superset tripwire:
+        if a STRUCTURAL hit is ever MISSING from grep coverage, the grep
+        regex itself broke (walker-not-subset-of-grep = RED, c27 class);
+      - workflow_call job-level `uses:` is collected too — a mutable ref
+        there executes a whole remote workflow, strictly bigger blast
+        radius than a step.
+    """
     fail = []
     import glob
-    steps = 0
-    for wf in sorted(glob.glob(".github/workflows/*.yml")):
+    wf_files = sorted(glob.glob(".github/workflows/*.yml"))
+    if not wf_files:
+        fail.append("zero workflow files found — glob or tree broke "
+                    "(vacuous green, B c27 rule)")
+
+    def grep_targets(wf):
+        hits = []
         for n, line in enumerate(read(wf).splitlines(), 1):
             if line.lstrip().startswith("#"):
                 continue  # comment prose may mention `uses:` (c31 flip-class)
             m = re.search(r"uses:\s*(\S+)", line)
-            if not m:
-                continue
-            target = m.group(1)
-            steps += 1
-            if target.startswith("./"):
-                continue
-            ref = target.rsplit("@", 1)[-1]
-            if not re.fullmatch(r"[0-9a-f]{40}", ref):
-                fail.append(f"{wf}:{n}: `uses: {target}` pins a MUTABLE ref "
-                            f"('{ref}') — replace with the 40-hex commit sha")
+            if m:
+                hits.append((n, m.group(1)))
+        return hits
+
+    steps = []  # (wf, label, value) — the structural authority
+    for wf in wf_files:
+        try:
+            for label, val in collect_uses_structural(wf):
+                steps.append((wf, label, val))
+        except Exception as e:
+            fail.append(f"{wf}: structural parse failed — cannot trust the "
+                        f"pin rail: {e}")
+    # coverage rail: every structural hit must ALSO be grep-visible. Grep is
+    # the over-capturer; walker-not-subset means the grep regex rotted and
+    # the old tripwire would silently stop covering real steps.
+    for wf, label, val in steps:
+        vals = {v for (_n, v) in grep_targets(wf)}
+        if val not in vals and not val.startswith("./"):
+            fail.append(f"{wf} [{label}]: structural uses: {val!r} is INVISIBLE "
+                        "to the grep tripwire — grep regex rotted")
+    for wf, label, target in steps:
+        if target.startswith("./"):
+            continue
+        ref = target.rsplit("@", 1)[-1]
+        if not re.fullmatch(r"[0-9a-f]{40}", ref):
+            fail.append(f"{wf} [{label}]: `uses: {target}` pins a MUTABLE ref "
+                        f"('{ref}') — replace with the 40-hex commit sha")
     if not steps:
         fail.append("zero `uses:` steps found — workflow glob or parse broke "
                     "(vacuous green, B c27 rule)")
+    # PIN/uses AGREEMENT rail (C c32 shape, railsite variant): leg 1 must
+    # pin the bytes of the ref that EXECUTES. If the uses: sha and
+    # PIN_ACTION_REF ever diverge, pin-verify verifies the wrong bytes.
+    sg = [t for (_w, _l, t) in steps
+          if t.startswith("tianzhicdev/secretgate-action@")]
+    pins = {p.strip("'\"") for p in
+            re.findall(r"PIN_ACTION_REF:\s*(\S+)",
+                       read(".github/workflows/secrets.yml"))
+            if re.fullmatch(r"[0-9a-f]{40}", p.strip("'\""))}
+    if sg:
+        refs = {t.rsplit("@", 1)[-1] for t in sg}
+        if refs != pins:
+            fail.append(f"uses: secretgate-action@{sorted(refs)} != "
+                        f"PIN_ACTION_REF {sorted(pins)} — leg 1 would pin "
+                        "bytes other than the ones that execute")
+        else:
+            print(f"OK: PIN_ACTION_REF agrees with the executing "
+                  f"secretgate-action ref ({sorted(refs)[0][:8]}..)")
     # STEP-ORDER rail (A c38 port, B c33): a pin that runs AFTER execution is
     # worthless (my own c30 lesson) — placement is a rail, not intent. Assert
     # on the PARSED YAML: leg1 < secretgate-action uses: < leg2, and demand
@@ -326,8 +407,9 @@ def mode_workflow():
             print(f"OK: pin order rail — leg1({idx['leg1']}) < uses"
                   f"({idx['uses']}) < leg2({idx['leg2']}) on parsed YAML")
     if not fail:
-        print(f"OK: all {steps} `uses:` steps content-addressed "
-              f"(40-hex sha or local ./)")
+        print(f"OK: all {len(steps)} `uses:` steps content-addressed "
+              f"(40-hex sha or local ./) + structural/grep coverage rail + "
+              "PIN/uses agreement rail")
     return fail
 
 
