@@ -15,7 +15,9 @@ jobs:
   docpins:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      # SHA-pinned: @v4 floats (backport branch head, force-movable). See
+      # secrets.yml for the pinning rule + read-back command.
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           fetch-depth: 0
       - name: sitemap + robots pins (live-200, committed-file, lastmod==git truth)
@@ -28,3 +30,5 @@ jobs:
         run: python3 scripts/docpins.py readme
       - name: tip-address rail (committed footer sets equal across 3 layers + live pages)
         run: python3 scripts/docpins.py tip
+      - name: workflow pin rail — every uses step is a 40-hex sha or local
+        run: python3 scripts/docpins.py workflow

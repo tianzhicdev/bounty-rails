@@ -260,8 +260,47 @@ def mode_tip():
     return fail
 
 
+def mode_workflow():
+    """c31: every `uses:` this repo's CI executes must be content-addressed.
+    c30 proved a pin-by-reference stack (floating tag -> action default ->
+    fetched engine) silently runs stale bytes; the same class applies to the
+    THIRD-PARTY layer (actions/checkout@v4 floats — the v4 head is a
+    force-movable backport branch). Rules:
+      - local `uses: ./...` = self-owned commit, allowed;
+      - everything else must pin a FULL 40-hex commit sha — tags (even
+        x.y.z) and branch names fail. Annotate the human-readable version
+        in a trailing comment, not the ref.
+    This mode fails if anyone re-introduces a ref-pinned step."""
+    fail = []
+    import glob
+    steps = 0
+    for wf in sorted(glob.glob(".github/workflows/*.yml")):
+        for n, line in enumerate(read(wf).splitlines(), 1):
+            if line.lstrip().startswith("#"):
+                continue  # comment prose may mention `uses:` (c31 flip-class)
+            m = re.search(r"uses:\s*(\S+)", line)
+            if not m:
+                continue
+            target = m.group(1)
+            steps += 1
+            if target.startswith("./"):
+                continue
+            ref = target.rsplit("@", 1)[-1]
+            if not re.fullmatch(r"[0-9a-f]{40}", ref):
+                fail.append(f"{wf}:{n}: `uses: {target}` pins a MUTABLE ref "
+                            f"('{ref}') — replace with the 40-hex commit sha")
+    if not steps:
+        fail.append("zero `uses:` steps found — workflow glob or parse broke "
+                    "(vacuous green, B c27 rule)")
+    if not fail:
+        print(f"OK: all {steps} `uses:` steps content-addressed "
+              f"(40-hex sha or local ./)")
+    return fail
+
+
 MODES = {"sitemap": mode_sitemap, "links": mode_links,
-         "anchors": mode_anchors, "readme": mode_readme, "tip": mode_tip}
+         "anchors": mode_anchors, "readme": mode_readme, "tip": mode_tip,
+         "workflow": mode_workflow}
 
 if __name__ == "__main__":
     mode = sys.argv[1] if len(sys.argv) > 1 else ""
