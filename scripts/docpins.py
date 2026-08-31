@@ -277,10 +277,39 @@ def mode_tip():
         if lset != sets[page]:
             fail.append(f"LIVE {url} footer tip set {sorted(lset)} != "
                         f"committed {sorted(sets[page])}")
+    # c37 (C c38 fleet parity): .github/FUNDING.yml is the layer GitHub
+    # surfaces as the 'Sponsor' button — an un-pinned one is an un-pinned
+    # money surface. It must carry EXACTLY the tip addr.
+    tip = next(iter(sets["guide.html"])) if len(sets.get("guide.html", set())) == 1 else None
+    if not os.path.exists(".github/FUNDING.yml"):
+        fail.append(".github/FUNDING.yml missing (sponsor surface unpinned)")
+        funding = ""
+    else:
+        funding = read(".github/FUNDING.yml")
+    faddrs = set(re.findall(r"0x[0-9a-fA-F]{40}", funding))
+    if faddrs != ({tip} if tip else set()):
+        fail.append(f"FUNDING.yml addr set {sorted(faddrs)} != tip {{{tip}}}")
+    # c37 reject sweep (C c38 F7/F8 shape): the two SIBLING fleet addrs must
+    # appear on this site ONLY inside require=<hex> deep links. Scrub those
+    # values first, then any surviving sibling addr in a receive-side layer
+    # (FUNDING, README, both page bodies) = a tip hijack lead -> RED. The
+    # scrub is proven scoped, not addr-blindness, by the flip pair F7 (plain
+    # sibling in body = RED) / F8 (same sibling inside require= = GREEN).
+    SIBLINGS = {"0xFD4090e27C1f946Ff01a265cAa7d4ACA662acC15",   # A
+                "0xf232dcdc177b53981b4d805a48c79f239db8d0f9"}   # C
+    layers = {"README.md": readme, ".github/FUNDING.yml": funding,
+              "index.html": read("index.html"), "guide.html": read("guide.html")}
+    for name, text in layers.items():
+        scrubbed = re.sub(r"require=0x[0-9a-fA-F]{40}", "require=<hex>", text)
+        bad = SIBLINGS & set(re.findall(r"0x[0-9a-fA-F]{40}", scrubbed))
+        if bad:
+            fail.append(f"sibling fleet addr {sorted(bad)} present in {name} "
+                        "outside a require= deep link (receive-side hijack lead)")
     if not fail:
-        addr = next(iter(sets["guide.html"])) if len(sets["guide.html"]) == 1 else "?"
-        print(f"OK: tip addr single across committed index/guide/README "
-              f"({addr[:8]}…{addr[-4:]}) + live pages")
+        addr = tip or "?"
+        print(f"OK: tip addr single across committed index/guide/README/FUNDING "
+              f"({addr[:8]}…{addr[-4:]}) + live pages + sibling-reject sweep "
+              "(require= links exempt)")
     return fail
 
 

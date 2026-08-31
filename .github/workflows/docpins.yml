@@ -28,7 +28,7 @@ jobs:
         run: python3 scripts/docpins.py anchors
       - name: README funnel stats + tip addr match guide.html
         run: python3 scripts/docpins.py readme
-      - name: tip-address rail (committed footer sets equal across 3 layers + live pages)
+      - name: tip-address rail (committed sets equal across index/guide/README/FUNDING + live pages + sibling-reject sweep)
         run: python3 scripts/docpins.py tip
       - name: workflow pin rail — every uses step is a 40-hex sha or local
         run: python3 scripts/docpins.py workflow
