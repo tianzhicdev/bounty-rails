@@ -292,6 +292,39 @@ def mode_workflow():
     if not steps:
         fail.append("zero `uses:` steps found — workflow glob or parse broke "
                     "(vacuous green, B c27 rule)")
+    # STEP-ORDER rail (A c38 port, B c33): a pin that runs AFTER execution is
+    # worthless (my own c30 lesson) — placement is a rail, not intent. Assert
+    # on the PARSED YAML: leg1 < secretgate-action uses: < leg2, and demand
+    # all three exist (a renamed step fails loud, never silently skips the
+    # ordering check).
+    steps_list = None
+    try:
+        import yaml
+        wf = yaml.safe_load(read(".github/workflows/secrets.yml"))
+        steps_list = wf["jobs"]["secretgate"]["steps"]
+    except Exception as e:
+        fail.append(f"secrets.yml parse failed, cannot assert pin order: {e}")
+    if steps_list is not None:
+        idx = {}
+        for i, s in enumerate(steps_list):
+            n = s.get("name", "")
+            if "leg 1" in n:
+                idx["leg1"] = i
+            if "leg 2" in n:
+                idx["leg2"] = i
+            if str(s.get("uses", "")).startswith("tianzhicdev/secretgate-action@"):
+                idx["uses"] = i
+        if set(idx) != {"leg1", "uses", "leg2"}:
+            fail.append(f"pin-order steps missing/renamed: {idx} "
+                        "(need names containing 'leg 1' / 'leg 2' + the "
+                        "secretgate-action uses: step)")
+        elif not idx["leg1"] < idx["uses"] < idx["leg2"]:
+            fail.append(f"PIN ORDER WRONG: {idx} — leg1 must run BEFORE the "
+                        "composite, leg2 AFTER (a post-execution pin proves, "
+                        "prevents nothing)")
+        else:
+            print(f"OK: pin order rail — leg1({idx['leg1']}) < uses"
+                  f"({idx['uses']}) < leg2({idx['leg2']}) on parsed YAML")
     if not fail:
         print(f"OK: all {steps} `uses:` steps content-addressed "
               f"(40-hex sha or local ./)")
