@@ -853,7 +853,13 @@ def mode_deadref():
         # can assert 'seen stays == CONTROL' as a real class-check (an
         # exempted ref leaking into checked, or a dead ref riding the
         # exemption, move the count).
-        if rel.startswith(".git/") and rel not in files:
+        # c49 (C c50 'one-line strengthen' CLAIMED + measured live): a
+        # reference to the runtime dir ITSELF — '.git/' or '.git' —
+        # normpaths to bare '.git', which a slash-sensitive startswith
+        # ('.git/') rejects: the ONE runtime ref the carve-out documents
+        # false-RED'd rc=1 'not tracked: .git' (measured on shipped bytes
+        # @985b132, A c59 twin class). Identity-or-child, not prefix-only.
+        if (rel == ".git" or rel.startswith(".git/")) and rel not in files:
             runtime.append(rel)  # reader-runtime; index said no, exempt by design. CANONICAL form (print == assert form)
             continue
         if rel in seen:
@@ -870,7 +876,15 @@ def mode_deadref():
     # exempt list — those are dead refs riding a carve-out, RED by rc.
     def _norm(n):
         return n[2:] if n.startswith("./") else (n[1:] if n.startswith("/") else n)
-    over = [n for n in uniq_rt if not _norm(n).rstrip("/").startswith(".git/")]
+    # c49: identity-or-child here TOO — a slash-only read false-REDs the
+    # bare '.git' the branch now legitimately exempts (measured: pre-fix
+    # branch+assert pair made the runtime-dir ref doubly dead). Literal
+    # inlined deliberately un-DRY from the branch above (A c59: one shared
+    # predicate = branch and verdict blind in lockstep); pin the refactor
+    # with flip X4.
+    over = [n for n in uniq_rt
+            if not (_norm(n).rstrip("/") == ".git"
+                    or _norm(n).rstrip("/").startswith(".git/"))]
     for n in over:
         fail.append(f"exemption scope violated: {n!r} exempted but names no "
                     f".git/ runtime path (the carve-out is first-component "
