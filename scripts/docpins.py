@@ -386,26 +386,39 @@ def mode_workflow():
     except Exception as e:
         fail.append(f"secrets.yml parse failed, cannot assert pin order: {e}")
     if steps_list is not None:
-        idx = {}
+        # EXACTLY-ONE locators (C c34 hardening of my c33 offer, free delta
+        # C offered): a DUPLICATED marker makes the order ambiguous — the
+        # last-wins dict shape would silently order on the wrong leg. Every
+        # locator must match EXACTLY ONE step: missing/renamed AND duplicated
+        # both fail loud.
+        hits = {"leg1": [], "uses": [], "leg2": []}
         for i, s in enumerate(steps_list):
             n = s.get("name", "")
             if "leg 1" in n:
-                idx["leg1"] = i
+                hits["leg1"].append(i)
             if "leg 2" in n:
-                idx["leg2"] = i
+                hits["leg2"].append(i)
             if str(s.get("uses", "")).startswith("tianzhicdev/secretgate-action@"):
-                idx["uses"] = i
-        if set(idx) != {"leg1", "uses", "leg2"}:
-            fail.append(f"pin-order steps missing/renamed: {idx} "
+                hits["uses"].append(i)
+        dup = {k: v for k, v in hits.items() if len(v) > 1}
+        miss = {k: v for k, v in hits.items() if len(v) == 0}
+        if miss:
+            fail.append(f"pin-order steps missing/renamed: {miss} "
                         "(need names containing 'leg 1' / 'leg 2' + the "
                         "secretgate-action uses: step)")
-        elif not idx["leg1"] < idx["uses"] < idx["leg2"]:
-            fail.append(f"PIN ORDER WRONG: {idx} — leg1 must run BEFORE the "
-                        "composite, leg2 AFTER (a post-execution pin proves, "
-                        "prevents nothing)")
+        elif dup:
+            fail.append(f"pin-order locator DUPLICATED: {dup} — ambiguous "
+                        "order (exactly one step per locator required, "
+                        "C c34)")
         else:
-            print(f"OK: pin order rail — leg1({idx['leg1']}) < uses"
-                  f"({idx['uses']}) < leg2({idx['leg2']}) on parsed YAML")
+            idx = {k: v[0] for k, v in hits.items()}
+            if not idx["leg1"] < idx["uses"] < idx["leg2"]:
+                fail.append(f"PIN ORDER WRONG: {idx} — leg1 must run BEFORE the "
+                            "composite, leg2 AFTER (a post-execution pin proves, "
+                            "prevents nothing)")
+            else:
+                print(f"OK: pin order rail — leg1({idx['leg1']}) < uses"
+                      f"({idx['uses']}) < leg2({idx['leg2']}) on parsed YAML")
     if not fail:
         print(f"OK: all {len(steps)} `uses:` steps content-addressed "
               f"(40-hex sha or local ./) + structural/grep coverage rail + "
