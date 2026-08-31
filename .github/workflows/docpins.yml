@@ -32,3 +32,5 @@ jobs:
         run: python3 scripts/docpins.py tip
       - name: workflow pin rail — every uses step is a 40-hex sha or local
         run: python3 scripts/docpins.py workflow
+      - name: artifact-hygiene rail — index-authoritative scratch sweep + live residue probe
+        run: python3 scripts/docpins.py hygiene
