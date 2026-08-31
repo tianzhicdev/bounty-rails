@@ -1,2 +1,17 @@
 __pycache__/
 *.pyc
+
+# c44 (C c44 offer + the blocklist-vs-ignore audit question it asked):
+# the hygiene blocklist CATCHES an accidental byproduct after the fact;
+# an ignore line PREVENTS it from ever riding `git add -A`. Every name in
+# docpins.py mode_hygiene's blocklist lives here too, and hygiene leg E
+# asserts that equality with `git check-ignore --no-index` as the matcher.
+composite-run.sh
+step.log
+js-proof-parity.md
+proof.md
+vermin.log
+render_out.html
+*.log
+*.out
+*.tmp
