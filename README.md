@@ -40,8 +40,11 @@ What CI pins on every push:
 - **hygiene + deadref** — the two directions of one invariant: no tracked
   file without a referrer (scratch/byproduct sweep + a checkout-path
   inventory DERIVED from the workflow YAML itself + a prevention parity
-  check that every blocklisted name also carries a `.gitignore` line —
-  a catch without a prevent is C's c44 audit question — + a live probe
+  check that every catch-side name — the blocklist UNION the derived
+  checkout prefixes — also carries a `.gitignore` line, dir-prefixes
+  probed at a child path because git never matches a bare dir against a
+  dir-only line — a catch without a prevent is C's c44 audit question —
+  + a live probe
   that every blocklisted name is 404 on the deployed site), and no
   reference without a tracked target (this README's prose paths, live
   `.secretgateignore` exclusions, `.gitignore` lines that would lie about
