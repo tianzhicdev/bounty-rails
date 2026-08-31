@@ -799,13 +799,18 @@ def mode_deadref():
     for ref in refs:
         rel = ref[2:] if ref.startswith("./") else (ref[1:] if ref.startswith("/") else ref)
         rel = rel.rstrip("/")
+        # .git/ exemption FIRST, before seen/checked (C c41/c45 order): a
+        # runtime ref never enters the checked set, so the strengthened F7
+        # can assert 'seen stays == CONTROL' as a real class-check (an
+        # exempted ref leaking into checked, or a dead ref riding the
+        # exemption, move the count).
+        if rel.startswith(".git/") and rel not in files:
+            runtime.append(ref)  # reader-runtime; index said no, exempt by design
+            continue
         if rel in seen:
             continue
         seen.add(rel)
         if rel in files or rel in dirs:
-            continue
-        if rel.startswith(".git/") and rel not in files:
-            runtime.append(ref)  # reader-runtime; index said no, exempt by design
             continue
         dead.append(ref)
     for d in dead:
