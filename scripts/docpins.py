@@ -644,9 +644,148 @@ def mode_hygiene():
     return fail
 
 
+def mode_deadref():
+    """Dead-reference rail (A c51 offer, port of C c41 + A's .git/ leg) — the
+    INVERSE arrow of mode hygiene: hygiene asks 'does every tracked file have
+    a referrer?'; this asks 'does every reference a reader or CI follows
+    still name something in the INDEX' (git ls-files is the authority, the
+    disk is not — B c40). Three silent-lie classes:
+      A. README prose path rotted by a rename (``` fences excluded BY DESIGN —
+         consumer snippets name paths in the READER's repo; unterminated
+         fence = refuse to guess scope, exit 2 fail-closed).
+      B. .secretgateignore pattern matching ZERO tracked paths = a dead
+         exclusion watching nothing.
+      C. .gitignore line naming a TRACKED file = the c40 accident's latent
+         form: gitignore never untracks, so the config lies while the file
+         stays public.
+    Railsite stakes (same doubling as hygiene): the tracked tree IS the served
+    tree, and the README here is GENERATOR-emitted — a rotted path in the
+    template re-ships silently on every future render, which is exactly the
+    frozen-mirror family this repo has fought since c25.
+    A c51 leg: a `.git/`-rooted prose path is reader-runtime (git never
+    tracks .git/) and is exempt ONLY after the index said no — a tracked
+    .git/... path stays RED — and the OK-line PRINTS the exemption count so
+    the carve-out can never skip silently (C c38 rule).
+    """
+    fail = []
+    r = subprocess.run(["git", "ls-files"], capture_output=True, text=True)
+    if r.returncode != 0:
+        return [f"git ls-files failed (rail is index-authoritative; cannot "
+                f"verify outside a repo): {r.stderr.strip()}"]
+    files = r.stdout.split()
+    if not files:
+        return ["git ls-files returned zero paths (empty index? vacuous rail)"]
+    dirs = set()
+    for f in files:
+        parts = f.split("/")[:-1]
+        for i in range(1, len(parts) + 1):
+            dirs.add("/".join(parts[:i]))
+
+    # A. README prose paths (fenced snippets are the reader's repo, not ours)
+    readme = read("README.md")
+    if readme.count("```") % 2 != 0:
+        print("FAIL: README has an unterminated ``` fence — refusing to "
+              "guess prose scope")
+        sys.exit(2)  # fail-closed: a rail that guesses fence state goes blind
+    prose_lines, in_fence = [], False
+    for line in readme.splitlines():
+        if line.lstrip().startswith("```"):
+            in_fence = not in_fence
+            continue
+        if not in_fence:
+            prose_lines.append(line)
+    prose = "\n".join(prose_lines)
+    refs = []
+    for m in re.finditer(r"`([^`\n]+)`", prose):
+        s = m.group(1).strip()
+        if "/" not in s or "@" in s or " " in s or s.startswith("tianzhicdev/"):
+            continue  # external-repo refs and non-paths are out of scope
+        if re.fullmatch(r"\.{0,2}/?[\w.\-]+(/[\w.\-]+)*/?", s):
+            refs.append(s)
+    for m in re.finditer(r"\]\((?!https?://|mailto:|#|/)([^)#\s]+)", prose):
+        refs.append(m.group(1))
+    seen, dead, runtime = set(), [], []
+    for ref in refs:
+        rel = ref[2:] if ref.startswith("./") else (ref[1:] if ref.startswith("/") else ref)
+        rel = rel.rstrip("/")
+        if rel in seen:
+            continue
+        seen.add(rel)
+        if rel in files or rel in dirs:
+            continue
+        if rel.startswith(".git/") and rel not in files:
+            runtime.append(ref)  # reader-runtime; index said no, exempt by design
+            continue
+        dead.append(ref)
+    for d in dead:
+        fail.append(f"README references a path that is not tracked: {d}")
+    if not dead:
+        print(f"OK: README prose paths all resolve ({len(seen)} checked: files + dirs"
+              + (f", {len(runtime)} reader-runtime .git/ paths exempt by design)"
+                 if runtime else ")"))
+
+    # B. .secretgateignore liveness (exact path, dir-prefix, or fnmatch —
+    # secretgate's real semantics)
+    try:
+        ex = read(".secretgateignore")
+    except FileNotFoundError:
+        ex = None
+    if ex is None:
+        print("OK: .secretgateignore absent — layer skipped by design "
+              "(scan strict by default)")
+    else:
+        import fnmatch
+        pats = [l.strip() for l in ex.splitlines()
+                if l.strip() and not l.strip().startswith("#")]
+        def excl_match(p, path):
+            if p.startswith("!"):
+                return None  # negation: none in use; skip conservatively
+            base_p = p.rstrip("/")
+            if path == base_p or path.startswith(base_p + "/"):
+                return True
+            return fnmatch.fnmatch(path, p) or fnmatch.fnmatch(path.split("/")[-1], p)
+        dead_pats = [p for p in pats
+                     if not any(excl_match(p, f) for f in files)]
+        for p in dead_pats:
+            fail.append(f".secretgateignore pattern matches ZERO tracked "
+                        f"paths: {p}")
+        if not dead_pats:
+            print(f"OK: .secretgateignore: all {len(pats)} exclusions match "
+                  ">=1 tracked path")
+
+    # C. .gitignore vs INDEX (dir-only patterns can't name an index entry)
+    try:
+        gi = read(".gitignore")
+    except FileNotFoundError:
+        gi = None
+    if gi is None:
+        print("OK: .gitignore absent — layer skipped by design")
+    else:
+        import fnmatch
+        pats = [l.strip() for l in gi.splitlines()
+                if l.strip() and not l.strip().startswith("#")]
+        conflicts = []
+        for p in pats:
+            if p.endswith("/") or p.startswith("!"):
+                continue
+            hits = [f for f in files
+                    if fnmatch.fnmatch(f, p) or fnmatch.fnmatch(f.split("/")[-1], p)]
+            if hits:
+                conflicts.append((p, hits))
+        for p, hits in conflicts:
+            fail.append(f".gitignore pattern '{p}' names TRACKED file(s) "
+                        f"(gitignore never untracks — c40 class): "
+                        f"{', '.join(sorted(hits)[:5])}")
+        if not conflicts:
+            print(f"OK: .gitignore: no pattern conflicts with the index "
+                  f"({len(pats)} patterns)")
+    return fail
+
+
 MODES = {"sitemap": mode_sitemap, "links": mode_links,
          "anchors": mode_anchors, "readme": mode_readme, "tip": mode_tip,
-         "workflow": mode_workflow, "hygiene": mode_hygiene}
+         "workflow": mode_workflow, "hygiene": mode_hygiene,
+         "deadref": mode_deadref}
 
 if __name__ == "__main__":
     mode = sys.argv[1] if len(sys.argv) > 1 else ""

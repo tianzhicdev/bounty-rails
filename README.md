@@ -37,6 +37,11 @@ What CI pins on every push:
   foreign host = bot-wall WARN per the rate-limit-is-not-death rule; our own
   host is strict); every internal/cross-page `#fragment` hits a real `id`;
   this README's funnel-stats line byte-matches `guide.html`'s.
+- **hygiene + deadref** — the two directions of one invariant: no tracked
+  file without a referrer (scratch/byproduct sweep + a live probe that every
+  blocklisted name is 404 on the deployed site), and no reference without a
+  tracked target (this README's prose paths, live `.secretgateignore`
+  exclusions, `.gitignore` lines that would lie about a tracked file).
 - **secrets** — the whole tree is scanned by
   [secretgate-action](https://github.com/tianzhicdev/secretgate-action) (the
   generated `index.html` — a curated table of public issue URLs — is excluded
