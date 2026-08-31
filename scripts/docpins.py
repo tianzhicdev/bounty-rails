@@ -712,9 +712,22 @@ def mode_hygiene():
     # probe would false-RED the rail — worse, the file shape `git add -A`
     # actually stages is the child, so the child probe is also the
     # faithful one.
+    # Claim-vs-work parity (C c51 count-lier offer + my c48 probe): the OK-line
+    # claims EVERY covered member was probed; a loop that drops one while the
+    # printed claim stays honest is a count-lier — my c48 probe measured it on
+    # live bytes (loop `covered[1:]` + a deleted ignore line -> rc=0 'OK: 6/6'
+    # with composite-run.sh uncovered and unnamed). In THIS rail the printed
+    # set is `sorted(covered)` (announce-yourself, c38), so a set-membership
+    # belt over the PRINT would be vacuous against a loop-drop: the only
+    # authority is the loop itself recording what it probed. `probed` is
+    # appended at the TOP of the body (a `continue` must not skip the record —
+    # that IS the swallow class) and the claim is checked against it BEFORE
+    # any OK print; a mismatch exits 2 naming the member, never a verdict.
     covered = sorted(blocklist | prefixes)
     unignored = []
+    probed = []
     for name in covered:
+        probed.append(name)
         probe = f"{name}c46-probe" if name.endswith("/") else name
         pr = subprocess.run(["git", "check-ignore", "--no-index", "-q", probe],
                             capture_output=True, text=True)
@@ -726,6 +739,12 @@ def mode_hygiene():
             print(f"FAIL: git check-ignore on {name} (probe {probe}) errored "
                   f"rc={pr.returncode}: {pr.stderr.strip()}")
             sys.exit(2)
+    if len(probed) != len(covered):
+        missing = [n for n in covered if n not in set(probed)]
+        print(f"FAIL: probe loop covered {len(probed)}/{len(covered)} — "
+              f"unprobed member(s) {missing}; refusing to print a claim "
+              f"the loop did not earn (c48 count-lier)")
+        sys.exit(2)
     for n in unignored:
         fail.append(f"catch+prevent name has NO .gitignore line "
                     f"(catch-without-prevent, C c44): {n}")
