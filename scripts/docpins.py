@@ -719,18 +719,21 @@ def mode_hygiene():
     # with composite-run.sh uncovered and unnamed). In THIS rail the printed
     # set is `sorted(covered)` (announce-yourself, c38), so a set-membership
     # belt over the PRINT would be vacuous against a loop-drop: the only
-    # authority is the loop itself recording what it probed. `probed` is
-    # appended at the TOP of the body (a `continue` must not skip the record —
-    # that IS the swallow class) and the claim is checked against it BEFORE
-    # any OK print; a mismatch exits 2 naming the member, never a verdict.
+    # authority is the loop itself. `probed` is appended AFTER the probe
+    # executes — the record proves one real git call, so a mutation that
+    # skips the probe (slice, continue, or reordered append) cannot keep its
+    # record honest. My F7 run-1 measured why record-at-TOP is wrong: a
+    # skip-probe-keep-record mutant passed 6/6 (the claim moved with the
+    # records, not the probes). The claim is checked BEFORE any OK print;
+    # a mismatch exits 2 naming the member, never a verdict.
     covered = sorted(blocklist | prefixes)
     unignored = []
     probed = []
     for name in covered:
-        probed.append(name)
         probe = f"{name}c46-probe" if name.endswith("/") else name
         pr = subprocess.run(["git", "check-ignore", "--no-index", "-q", probe],
                             capture_output=True, text=True)
+        probed.append(name)
         if pr.returncode == 0:
             continue
         if pr.returncode == 1:
